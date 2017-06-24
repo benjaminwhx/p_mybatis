@@ -1,6 +1,8 @@
 # mybatis
 mybatis学习
 
+mybatis-generator中文文档地址：[mybatis-generator](http://mbg.cndocs.tk/index.html)
+
 https://my.oschina.net/lixin91/blog?catalog=3489293&temp=1497112350271
 
 http://www.mybatis.tk/

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+		PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+		"http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+<generatorConfiguration>
+	<context id="MySQLTables" defaultModelType="flat">
+		<property name="autoDelimitKeywords" value="true" />
+		<property name="beginningDelimiter" value="`" />
+		<property name="endingDelimiter" value="`" />
+		
+		<commentGenerator>
+			<property name="suppressAllComments" value="true"/>
+			<property name="suppressDate" value="true"/>
+		</commentGenerator>
+		
+		<jdbcConnection driverClass="com.mysql.cj.jdbc.Driver"
+		                connectionURL="jdbc:mysql://localhost/mybatis?useUnicode=true&amp;characterEncoding=UTF-8&amp;useJDBCCompliantTimezoneShift=true&amp;useLegacyDatetimeCode=false&amp;serverTimezone=UTC"
+		                userId="root"
+		                password="123456">
+		</jdbcConnection>
+		
+		<javaTypeResolver >
+			<property name="forceBigDecimals" value="false" />
+		</javaTypeResolver>
+		
+		<javaModelGenerator targetPackage="com.github.generator" targetProject="C:\Users\Administrator\IdeaProjects\mybatis\mybatis-generator\src\main\java">
+			<property name="enableSubPackages" value="true" />
+			<property name="trimStrings" value="true" />
+		</javaModelGenerator>
+		
+		<sqlMapGenerator targetPackage="mapper"  targetProject="C:\Users\Administrator\IdeaProjects\mybatis\mybatis-generator\src\main\resources">
+			<property name="enableSubPackages" value="true" />
+		</sqlMapGenerator>
+		
+		<javaClientGenerator type="XMLMAPPER" targetPackage="com.github.generator.mapper"
+		                     targetProject="C:\Users\Administrator\IdeaProjects\mybatis\mybatis-generator\src\main\java"/>
+		
+		<!--
+			tableName="%" 生成全部表，可以使用SQL通配符匹配多个表
+				% 替代一个或多个字符
+				_ 仅替代一个字符
+				[charlist] 字符列中的任何单一字符
+				[^charlist]或者[!charlist] 不在字符列中的任何单一字符
+			
+		-->
+		<table tableName="cf_user" domainObjectName="User">
+			<generatedKey column="id" sqlStatement="JDBC"/>
+		</table>
+		<table tableName="cf_order" domainObjectName="Order">
+			<generatedKey column="id" sqlStatement="JDBC"/>
+		</table>
+		<table tableName="cf_role" domainObjectName="Role">
+			<generatedKey column="id" sqlStatement="JDBC"/>
+		</table>
+	</context>
+</generatorConfiguration>
