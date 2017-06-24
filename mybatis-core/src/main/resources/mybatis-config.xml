@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+		PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<!--
+		1、优先读取properties配置的属性
+		2、读取resource或者url指定的属性文件，并进行覆盖同名属性
+		3、读取方法参数传递的属性，覆盖同名属性
+		mybatis 3.4.2开始，可以使用占位符，具体使用：http://www.mybatis.org/mybatis-3/zh/configuration.html
+			打开开关，增加下面的property
+			<property name="org.apache.ibatis.parsing.PropertyParser.enable-default-value" value="true"/>
+			ext: value="${username:ut_user}" username如果找不到使用ut_user代替
+	-->
+	<properties resource="dbConfig.properties">
+		<property name="username" value="root"/>
+		<property name="password" value="123456"/>
+	</properties>
+	
+	<settings>
+		<setting name="lazyLoadingEnabled" value="true"/>
+		<setting name="aggressiveLazyLoading" value="false"/>
+	</settings>
+	
+	<!-- 扫描包下面的类，注册别名，@Alias如果存在使用，不存在默认使用类名 -->
+	<typeAliases>
+		<package name="com.github.base.bean"/>
+	</typeAliases>
+	
+	<!-- 类型转换 -->
+	<typeHandlers>
+		<package name="com.github.base.typeHandler"/>
+	</typeHandlers>
+	
+	<plugins>
+		<!-- 自定义的page插件，不推荐使用 -->
+		<plugin interceptor="com.github.core.plugin.PagePlugin">
+			<property name="databaseType" value="mysql" />
+		</plugin>
+		<plugin interceptor="com.github.core.plugin.PerformanceInterceptor" />
+	</plugins>
+	
+	<!-- 指定默认环境为development，可以通过SqlSessionFactoryBuilder.build()指定覆盖 -->
+	<environments default="development">
+		<environment id="development">
+			<!-- 在Configuration()方法中配置别名 -->
+			<transactionManager type="JDBC"/>
+			<dataSource type="POOLED">
+				<property name="driver" value="${mysql.driver}"/>
+				<property name="url" value="${mysql.url}"/>
+				<property name="username" value="${username}"/>
+				<property name="password" value="${password}"/>
+			</dataSource>
+		</environment>
+		<environment id="test">
+			<transactionManager type="JDBC"/>
+			<dataSource type="POOLED">
+				<property name="driver" value="${mysql.driver}"/>
+				<property name="url" value="${mysql.url}"/>
+				<property name="username" value="${username}"/>
+				<property name="password" value="${password}"/>
+			</dataSource>
+		</environment>
+		<environment id="product">
+			<transactionManager type="JDBC"/>
+			<dataSource type="POOLED">
+				<property name="driver" value="${mysql.driver}"/>
+				<property name="url" value="${mysql.url}"/>
+				<property name="username" value="${username}"/>
+				<property name="password" value="${password}"/>
+			</dataSource>
+		</environment>
+	</environments>
+	
+	<databaseIdProvider type="DB_VENDOR">
+		<property name="SQL_Server" value="sqlserver"/>
+		<property name="DB2" value="db2"/>
+		<property name="Oracle" value="oracle"/>
+	</databaseIdProvider>
+	
+	<!--
+		mapper class 和 package都必须把mapper.xml放在和Mapper接口同样的包下面才可以映射到
+		mapper resource指定resource目录下的mapper.xml文件，目前不知道怎么指定包
+	-->
+	<mappers>
+		<mapper resource="mapper/UserMapper.xml" />
+		<mapper class="com.github.base.mapper.OrderMapper" />
+		<mapper resource="mapper/RoleMapper.xml" />
+	</mappers>
+</configuration>

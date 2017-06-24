@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.base.mapper.UserMapper">
+	
+	<sql id="selectColumns">
+		<choose>
+			<when test="_parameter != null">
+				${prefix}.id, ${prefix}.user_name, ${prefix}.sex, ${prefix}.role_id
+			</when>
+			<otherwise>
+				id, user_name, sex, role_id
+			</otherwise>
+		</choose>
+	</sql>
+	
+	<!--
+		eviction：代表的是缓存回收策略
+			LRU：最近最少使用的，移除最长时间不用的对象
+			FIFO：先进先出，按对象进入缓存的顺序来移除他们
+			SOFT：软引用，移除基于垃圾回收器状态和软引用规则的对象
+			WEAK：弱引用，更积极地移除基于垃圾回收器状态和弱引用规则的对象。
+		flushInterval：刷新间隔时间，单位为毫秒，这里配置的是100秒刷新，如果你不配置它，那么当SQL被执行的时候才会去刷新缓存
+		size：引用数目，代表缓存最多可以存储多少个对象，不宜设置过大，过大会导致内存溢出。
+		readOnly：只读，意味着缓存数据只能读取而不能修改，这样设置的好处是我们可以快速读取缓存，缺点是我们没办法修改缓存。
+		type可以指定自定义的缓存，例如用redis来存储。
+	-->
+	<!--<cache eviction="LRU" flushInterval="100000" size="1024" readOnly="true" />-->
+	<!--<cache type="com.github.core.cache.MyCache"/>-->
+	
+	<resultMap id="userResultMap" type="user">
+		<!-- 当没有默认的无参构造方法时，使用constructor，arg的顺序要和参数位置一致 -->
+		<!--<constructor>-->
+			<!--<arg column="user_name" javaType="java.lang.String" />-->
+		<!--</constructor>-->
+		<id property="id" column="id" />
+		<result property="userName" column="user_name" />
+		<result property="sex" column="sex" javaType="sex" jdbcType="INTEGER" typeHandler="com.github.base.typeHandler.MySexTypeHandler" />
+		<result property="roleId" column="role_id" javaType="java.lang.Long" jdbcType="BIGINT" />
+		<!-- 多对一查询 -->
+		<association property="role" column="role_id" fetchType="lazy" select="com.github.base.mapper.RoleMapper.findRoleById"/>
+		<!-- 通过id查询List<Order> 关联order的uid字段，实现多对一映射 -->
+		<collection property="orderList" select="com.github.base.mapper.OrderMapper.getOrdersByUid" ofType="order" column="id" fetchType="lazy"/>
+	</resultMap>
+	
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="user">
+		INSERT INTO
+			cf_user (user_name, sex, role_id)
+	  	VALUES
+	  		(#{userName}, #{sex, typeHandler=com.github.base.typeHandler.MySexTypeHandler, javaType=sex, jdbcType=INTEGER}, #{roleId})
+	</insert>
+	
+	<select id="getUserByUserId" resultMap="userResultMap" parameterType="java.lang.Long">
+		SELECT
+		<include refid="selectColumns">
+			<property name="prefix" value="a" />
+		</include>
+		FROM cf_user a
+	  	<where>
+		    id = #{uid, jdbcType=BIGINT}
+	    </where>
+	</select>
+	
+	<select id="getUsersByName" resultMap="userResultMap">
+		SELECT
+		<include refid="selectColumns">
+			<property name="prefix" value="a" />
+		</include>
+		FROM cf_user a
+		<where>
+			user_name = #{name}
+		</where>
+	</select>
+	
+	<!-- 别名映射可以用下面这种方式，不过最好用resultMap这样可以共用 -->
+	<!--<select id="getAllOrders" resultType="Order">-->
+		<!--select-->
+			<!--a.id as "id",-->
+			<!--a.user_name as "userName",-->
+			<!--a.sex as "sex",-->
+			<!--a.role_id as "roleId",-->
+		<!--FROM-->
+			<!--cf_user a-->
+	<!--</select>-->
+	
+	<select id="getAllUsers" resultMap="userResultMap">
+		SELECT
+		<include refid="selectColumns">
+			<property name="prefix" value="a" />
+		</include>
+		FROM cf_user a
+	</select>
+	
+	<select id="getUserByRowBounds" resultMap="userResultMap">
+		SELECT
+		<include refid="selectColumns">
+			<property name="prefix" value="a" />
+		</include>
+		FROM cf_user a
+	</select>
+	
+	<select id="getUserByPage" resultMap="userResultMap">
+		SELECT
+		<include refid="selectColumns">
+			<property name="prefix" value="a" />
+		</include>
+		FROM cf_user a
+	</select>
+	
+	<update id="update" parameterType="user">
+		update cf_user
+		<set>
+			<if test="userName != null">
+				user_name = #{userName},
+			</if>
+			<if test="sex != null">
+				sex = #{sex, javaType=com.github.base.bean.SEX, jdbcType=INTEGER, typeHandler=com.github.base.typeHandler.MySexHandler},
+			</if>
+			<if test="roleId != null">
+				role_id = #{roleId},
+			</if>
+		</set>
+		<trim prefix="where" prefixOverrides="AND |OR">
+			<if test="id != null">
+				and id = #{id}
+			</if>
+		</trim>
+	</update>
+	
+	<delete id="delete">
+		DELETE FROM
+			cf_user
+		<where>
+			<if test="_parameter != null">
+			  	AND id = #{id}
+			</if>
+		</where>
+	</delete>
+</mapper>

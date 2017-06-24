@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+		PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	
+	<properties resource="dbConfig.properties" />
+	
+	<settings>
+		<setting name="lazyLoadingEnabled" value="true"/>
+		<setting name="aggressiveLazyLoading" value="false"/>
+	</settings>
+	
+	<!-- 扫描包下面的类，注册别名，@Alias如果存在使用，不存在默认使用类名 -->
+	<typeAliases>
+		<package name="com.github.base.bean"/>
+	</typeAliases>
+	
+	<!-- 类型转换 -->
+	<typeHandlers>
+		<package name="com.github.base.typeHandler"/>
+	</typeHandlers>
+	
+	<plugins>
+		<plugin interceptor="tk.mybatis.orderbyhelper.OrderByHelper" />
+	</plugins>
+	
+	<environments default="development">
+		<environment id="development">
+			<transactionManager type="JDBC"/>
+			<dataSource type="POOLED">
+				<property name="driver" value="${mysql.driver}"/>
+				<property name="url" value="${mysql.url}"/>
+				<property name="username" value="${mysql.userName}"/>
+				<property name="password" value="${mysql.password}"/>
+			</dataSource>
+		</environment>
+	</environments>
+	
+	<databaseIdProvider type="DB_VENDOR">
+		<property name="SQL_Server" value="sqlserver"/>
+		<property name="DB2" value="db2"/>
+		<property name="Oracle" value="oracle"/>
+	</databaseIdProvider>
+	
+	<mappers>
+		<mapper resource="mapper/UserMapper.xml" />
+		<mapper class="com.github.base.mapper.OrderMapper" />
+		<mapper resource="mapper/RoleMapper.xml" />
+	</mappers>
+</configuration>

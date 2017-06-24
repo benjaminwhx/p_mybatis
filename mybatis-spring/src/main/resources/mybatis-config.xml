@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+		PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<settings>
+		<setting name="lazyLoadingEnabled" value="true"/>
+		<setting name="aggressiveLazyLoading" value="false"/>
+		<setting name="defaultExecutorType" value="BATCH"/>
+	</settings>
+	
+	<typeAliases>
+		<package name="com.github.base.bean"/>
+	</typeAliases>
+	
+	<typeHandlers>
+		<package name="com.github.base.typeHandler"/>
+	</typeHandlers>
+	
+	<plugins>
+		<plugin interceptor="com.github.pagehelper.PageInterceptor" />
+	</plugins>
+</configuration>

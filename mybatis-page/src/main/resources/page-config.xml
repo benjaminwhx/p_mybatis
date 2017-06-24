@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+		PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	
+	<properties resource="dbConfig.properties" />
+	
+	<settings>
+		<setting name="lazyLoadingEnabled" value="true"/>
+		<setting name="aggressiveLazyLoading" value="false"/>
+	</settings>
+	
+	<!-- 扫描包下面的类，注册别名，@Alias如果存在使用，不存在默认使用类名 -->
+	<typeAliases>
+		<package name="com.github.base.bean"/>
+	</typeAliases>
+	
+	<!-- 类型转换 -->
+	<typeHandlers>
+		<package name="com.github.base.typeHandler"/>
+	</typeHandlers>
+	
+	<plugins>
+		<!--
+			Fix bug @See：https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/zh/Interceptor.md
+			下面的配置执行顺序为：PgaeInterceptor -> PerformanceInterceptor -> 原方法调用 -> PerformanceInterceptor -> PgaeInterceptor
+		-->
+		<plugin interceptor="com.github.page.plugin.PerformanceInterceptor" />
+		
+		<!-- 文档https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/zh/HowToUse.md -->
+		<plugin interceptor="com.github.pagehelper.PageInterceptor">
+			<!--
+				分页插件会自动检测当前的数据库链接，自动选择合适的分页方式。
+				你可以配置helperDialect属性来指定分页插件使用哪种方言
+				配置时，可以使用下面的缩写值：
+				oracle,mysql,mariadb,sqlite,hsqldb,postgresql,db2,
+				sqlserver,informix,h2,sqlserver2012,derby
+				特别注意：使用 SqlServer2012 数据库时，需要手动指定为 sqlserver2012，
+				否则会使用 SqlServer2005 的方式进行分页。
+				你也可以实现 AbstractHelperDialect，然后配置该属性为实现类的全限定名称即可使用自定义的实现方法。
+			-->
+			<property name="helperDialect" value="mysql" />
+			
+			<!--
+				参数对使用 RowBounds 作为分页参数时有效。
+				当该参数设置为 true 时，会将 RowBounds 中的 offset 参数当成 pageNum 使用，
+				可以用页码和页面大小两个参数进行分页。
+				默认false
+			-->
+			<property name="offsetAsPageNum" value="false" />
+			
+			<!--
+				参数对使用 RowBounds 作为分页参数时有效。 当该参数设置为true时，
+				使用 RowBounds 分页会进行 count 查询。
+				默认false
+			-->
+			<property name="rowBoundsWithCount" value="false" />
+			
+			<!--
+				当该参数设置为 true 时，如果 pageSize=0 或者 RowBounds.
+				limit = 0 就会查询出全部的结果（相当于没有执行分页查询，但是返回结果仍然是 Page 类型）。
+				默认false
+			-->
+			<property name="pageSizeZero" value="false" />
+			
+			<!--
+				当该参数设置为 true 时，pageNum<=0 时会查询第一页，
+				pageNum>pages（超过总数时），会查询最后一页。默认false 时，直接根据参数进行查询
+				默认false
+			-->
+			<property name="reasonable" value="false" />
+			
+			<!--
+				允许在运行时根据多数据源自动识别对应方言的分页 （不支持自动选择sqlserver2012，只能使用sqlserver）
+				默认false
+			-->
+			<property name="autoRuntimeDialect" value="false" />
+			
+			<!--
+				当使用运行时动态数据源或没有设置 helperDialect 属性自动获取数据库类型时，
+				会自动获取一个数据库连接， 通过该属性来设置是否关闭获取的这个连接，默认true关闭，
+				设置为 false 后，不会关闭获取的连接，这个参数的设置要根据自己选择的数据源来决定。
+				默认true
+			-->
+			<property name="closeConn" value="true" />
+			
+			<!-- 是否支持接口参数来传递分页参数，默认false （这个版本的bug，配置不配置都无效） -->
+			<property name="supportMethodsArguments" value="true" />
+		</plugin>
+	</plugins>
+	
+	<environments default="development">
+		<environment id="development">
+			<transactionManager type="JDBC"/>
+			<dataSource type="POOLED">
+				<property name="driver" value="${mysql.driver}"/>
+				<property name="url" value="${mysql.url}"/>
+				<property name="username" value="${mysql.userName}"/>
+				<property name="password" value="${mysql.password}"/>
+			</dataSource>
+		</environment>
+	</environments>
+	
+	<databaseIdProvider type="DB_VENDOR">
+		<property name="SQL_Server" value="sqlserver"/>
+		<property name="DB2" value="db2"/>
+		<property name="Oracle" value="oracle"/>
+	</databaseIdProvider>
+	
+	<mappers>
+		<mapper resource="mapper/UserMapper.xml" />
+		<mapper class="com.github.base.mapper.OrderMapper" />
+		<mapper resource="mapper/RoleMapper.xml" />
+	</mappers>
+</configuration>
