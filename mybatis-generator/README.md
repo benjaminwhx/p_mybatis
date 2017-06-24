@@ -598,3 +598,5 @@ enableXXX:XXX代表多种SQL方法，该属性用来指定是否生成对应的X
 `<table>`这里用的通配符匹配全部的表，另外所有表都有自动增长的`id`字段。如果不是所有表的配置都一样，可以做针对性的配置。
 
 **改动**：去掉来不建议使用Example查询的建议，Example在单表操作上优势明显，可以看个人情况使用。
+
+本文完全复制自：[http://blog.csdn.net/isea533/article/details/42102297](http://blog.csdn.net/isea533/article/details/42102297)
