@@ -57,7 +57,7 @@ public class MyBatisCoreBuilder {
 	private void testUserMapperSelect1() {
 		SqlSession sqlSession = MyBatisConfigHelper.getSqlSession();
 		UserMapper mapper = sqlSession.getMapper(UserMapper.class);
-		User user = mapper.getUserByUserId(1L);
+		User user = mapper.getUserByUserId(2L);
 		logger.info(user.toString());
 	}
 
@@ -111,12 +111,12 @@ public class MyBatisCoreBuilder {
 		MyBatisCoreBuilder builder = new MyBatisCoreBuilder();
 //		builder.testUserMapperInsert();
 //		builder.testUserMapperInsertMulti();
-//		builder.testUserMapperSelect1();
+		builder.testUserMapperSelect1();
 //		builder.testUserMapperSelect2();
 //		builder.testUserMapperSelect3();
 //		builder.testUserMapperSelect4();
 //		builder.testUserMapperSelect5();
 //		builder.testUserMapperUpdate();
-		builder.testUserMapperDelete();
+//		builder.testUserMapperDelete();
 	}
 }

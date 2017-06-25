@@ -43,13 +43,14 @@ public class CommonMapperTest {
     }
 
     private void testMapper3() {
-        SqlSession sqlSession = CommonMapperHelper.getSqlSession(true);
+        SqlSession sqlSession = CommonMapperHelper.getSqlSession();
         UserLoginMapper mapper = sqlSession.getMapper(UserLoginMapper.class);
         UserLogin userLogin = new UserLogin();
         userLogin.setUsername("benjamin");
         userLogin.setLogindate(new Date());
         userLogin.setLoginip("192.168.1.1");
         int i = mapper.insertUseGeneratedKeys(userLogin);
+        sqlSession.commit();
         logger.info("i=" + i + ", id=" + userLogin.getLogid());
     }
 

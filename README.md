@@ -4,13 +4,20 @@
 
 1、mybatis-page中文文档地址：[https://pagehelper.github.io/](https://pagehelper.github.io/)  
 2、mybatis-generator中文文档地址：[mybatis-generator](http://mbg.cndocs.tk/index.html)  
-3、mybatis相关工具地址：[http://www.mybatis.tk/](http://www.mybatis.tk/)
+3、mybatis相关工具地址：[http://www.mybatis.tk/](http://www.mybatis.tk/)  
 4、mybatis官方指南：[http://www.mybatis.org/mybatis-3/zh/index.html](http://www.mybatis.org/mybatis-3/zh/index.html)  
 5、mybatis-spring官方指南：[http://www.mybatis.org/spring/zh/index.html](http://www.mybatis.org/spring/zh/index.html)  
+
+## github地址
+
+1、Mapper: [Mapper](https://github.com/abel533/Mapper)  
+2、PageHelper：[PageHelper](https://github.com/pagehelper/Mybatis-PageHelper)  
 
 https://my.oschina.net/lixin91/blog?catalog=3489293&temp=1497112350271
 
 中文注释：https://github.com/tuguangquan/mybatis
+
+mybatis设计模式：http://www.crazyant.net/2022.html
 
 ## mybatis study instruction（mybatis学习指南）
 
