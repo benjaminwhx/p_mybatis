@@ -92,3 +92,55 @@ INSERT INTO `cf_user` VALUES ('10', 'Wasj', '1', '2');
 INSERT INTO `cf_user` VALUES ('11', 'Fisher', '1', '1');
 INSERT INTO `cf_user` VALUES ('12', 'Pors', '2', '2');
 INSERT INTO `cf_user` VALUES ('13', 'Yons', '1', '3');
+
+-- ----------------------------
+-- Table structure for user_login
+-- ----------------------------
+DROP TABLE IF EXISTS `user_login`;
+CREATE TABLE `user_login` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `username` varchar(32) NOT NULL,
+  `logindate` datetime DEFAULT NULL,
+  `loginip` varchar(16) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of user_login
+-- ----------------------------
+INSERT INTO `user_login` VALUES ('1', 'test1', '2014-10-11 12:00:00', '192.168.1.123');
+INSERT INTO `user_login` VALUES ('2', 'test1', '2014-10-21 12:00:00', '192.168.1.123');
+INSERT INTO `user_login` VALUES ('3', 'test1', '2014-10-21 14:00:00', '192.168.1.123');
+INSERT INTO `user_login` VALUES ('4', 'test1', '2014-11-21 11:20:00', '192.168.1.123');
+INSERT INTO `user_login` VALUES ('5', 'test1', '2014-11-21 13:00:00', '192.168.1.123');
+INSERT INTO `user_login` VALUES ('6', 'test2', '2014-11-21 12:00:00', '192.168.1.123');
+INSERT INTO `user_login` VALUES ('7', 'test2', '2014-11-21 12:00:00', '192.168.1.123');
+INSERT INTO `user_login` VALUES ('8', 'test3', '2014-11-21 12:00:00', '192.168.1.123');
+INSERT INTO `user_login` VALUES ('9', 'test4', '2014-11-21 12:00:00', '192.168.1.123');
+INSERT INTO `user_login` VALUES ('10', 'test5', '2014-11-21 12:00:00', '192.168.1.123');
+
+-- ----------------------------
+-- Table structure for user_login2
+-- ----------------------------
+DROP TABLE IF EXISTS `user_login2`;
+CREATE TABLE `user_login2` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `username` varchar(32) NOT NULL,
+  `logindate` datetime DEFAULT NULL,
+  `loginip` varchar(16) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of user_login2
+-- ----------------------------
+INSERT INTO `user_login2` VALUES ('1', 'test1', '2014-10-11 12:00:00', '192.168.1.123');
+INSERT INTO `user_login2` VALUES ('2', 'test1', '2014-10-21 12:00:00', '192.168.1.123');
+INSERT INTO `user_login2` VALUES ('3', 'test1', '2014-10-21 14:00:00', '192.168.1.123');
+INSERT INTO `user_login2` VALUES ('4', 'test1', '2014-11-21 11:20:00', '192.168.1.123');
+INSERT INTO `user_login2` VALUES ('5', 'test1', '2014-11-21 13:00:00', '192.168.1.123');
+INSERT INTO `user_login2` VALUES ('6', 'test2', '2014-11-21 12:00:00', '192.168.1.123');
+INSERT INTO `user_login2` VALUES ('7', 'test2', '2014-11-21 12:00:00', '192.168.1.123');
+INSERT INTO `user_login2` VALUES ('8', 'test3', '2014-11-21 12:00:00', '192.168.1.123');
+INSERT INTO `user_login2` VALUES ('9', 'test4', '2014-11-21 12:00:00', '192.168.1.123');
+INSERT INTO `user_login2` VALUES ('10', 'test5', '2014-11-21 12:00:00', '192.168.1.123');

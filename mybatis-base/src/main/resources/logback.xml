@@ -13,7 +13,10 @@
 		</filter>
 	</appender>
 	
-	<logger name="com.github.base.mapper" level="DEBUG">
+	<logger name="com.github.base.mapper" level="DEBUG" additivity="false">
+		<appender-ref ref="STDOUT"/>
+	</logger>
+	<logger name="com.github.mapper.mapper" level="DEBUG" additivity="false">
 		<appender-ref ref="STDOUT"/>
 	</logger>
 	

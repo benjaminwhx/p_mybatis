@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+		PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<properties resource="dbConfig.properties" />
+	<settings>
+		<setting name="lazyLoadingEnabled" value="true"/>
+		<setting name="aggressiveLazyLoading" value="false"/>
+	</settings>
+	
+	<typeAliases>
+		<package name="com.github.mapper.mapper.model"/>
+	</typeAliases>
+
+	<plugins>
+		<plugin interceptor="com.github.mapper.plugin.PerformanceInterceptor" />
+	</plugins>
+
+	<environments default="development">
+		<environment id="development">
+			<transactionManager type="JDBC"/>
+			<dataSource type="POOLED">
+				<property name="driver" value="${mysql.driver}"/>
+				<property name="url" value="${mysql.url}"/>
+				<property name="username" value="${mysql.userName}"/>
+				<property name="password" value="${mysql.password}"/>
+			</dataSource>
+		</environment>
+	</environments>
+	<!--<plugins>-->
+		<!--<plugin interceptor="com.github.pagehelper.PageInterceptor" />-->
+	<!--</plugins>-->
+
+	<mappers>
+		<mapper class="com.github.mapper.mapper.UserLoginMapper" />
+	</mappers>
+</configuration>
