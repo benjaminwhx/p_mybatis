@@ -19,6 +19,9 @@
 	<logger name="com.github.mapper.mapper" level="DEBUG" additivity="false">
 		<appender-ref ref="STDOUT"/>
 	</logger>
+	<logger name="com.github.spring.mapper" level="DEBUG" additivity="false">
+		<appender-ref ref="STDOUT"/>
+	</logger>
 	
 	<root level="INFO">
 		<appender-ref ref="STDOUT" />

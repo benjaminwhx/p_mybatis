@@ -46,8 +46,15 @@
 		</property>
     </bean>
 
-    <bean id="commonMapperScannerConfigurer" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+    <!-- mybatis结合spring配置，basePackage可以把mapper类交由spring管理，并在mybatis中注册 -->
+    <!--<bean id="springMapperScannerConfigurer" class="org.mybatis.spring.mapper.MapperScannerConfigurer">-->
+        <!--<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>-->
+        <!--<property name="basePackage" value="com.github.base.mapper"/>-->
+    <!-- <!bean>-->
+
+    <bean id="commonMapperScannerConfigurer" class="tk.mybatis.spring.mapper.MapperScannerConfigurer">
         <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
-        <property name="basePackage" value="com.github.base.mapper"/>
+        <property name="basePackage" value="com.**.mapper"/>
+        <!--<property name="markerInterface" valcom.github.spring.common.CommonMapperpper" />-->
     </bean>
 </beans>

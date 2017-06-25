@@ -18,6 +18,7 @@
 	</typeHandlers>
 	
 	<plugins>
+		<plugin interceptor="com.github.spring.plugin.PerformanceInterceptor" />
 		<plugin interceptor="com.github.pagehelper.PageInterceptor" />
 	</plugins>
 </configuration>
