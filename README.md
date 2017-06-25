@@ -1,11 +1,14 @@
 # mybatis
-mybatis学习
 
-mybatis-generator中文文档地址：[mybatis-generator](http://mbg.cndocs.tk/index.html)
+## 文档地址
+
+1、mybatis-page中文文档地址：[https://pagehelper.github.io/](https://pagehelper.github.io/)  
+2、mybatis-generator中文文档地址：[mybatis-generator](http://mbg.cndocs.tk/index.html)  
+3、mybatis相关工具地址：[http://www.mybatis.tk/](http://www.mybatis.tk/)
+4、mybatis官方指南：[http://www.mybatis.org/mybatis-3/zh/index.html](http://www.mybatis.org/mybatis-3/zh/index.html)  
+5、mybatis-spring官方指南：[http://www.mybatis.org/spring/zh/index.html](http://www.mybatis.org/spring/zh/index.html)  
 
 https://my.oschina.net/lixin91/blog?catalog=3489293&temp=1497112350271
-
-http://www.mybatis.tk/
 
 中文注释：https://github.com/tuguangquan/mybatis
 
