@@ -26,19 +26,26 @@
 	</dependencies>
 	
 	<properties>
-		<!--  MyBatis Generator  -->
-		<!--  Java接口和实体类  -->
-		<targetJavaProject>${basedir}/src/main/java</targetJavaProject>
-		<targetMapperPackage>com.github.generator.mapper</targetMapperPackage>
-		<targetModelPackage>com.github.generator</targetModelPackage>
-		<!--  XML生成路径  -->
-		<targetResourcesProject>${basedir}/src/main/resources</targetResourcesProject>
-		<targetXMLPackage>mapper</targetXMLPackage>
-		
 		<mysql.version>6.0.6</mysql.version>
 	</properties>
 	
 	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources/</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>**/*.properties</include>
+				</includes>
+			</resource>
+			<resource>
+				<directory>src/main/resources/</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>**/*.xml</include>
+				</includes>
+			</resource>
+		</resources>
 		<plugins>
 			<plugin>
 				<groupId>org.mybatis.generator</groupId>
@@ -59,4 +66,29 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<profiles>
+		<profile>
+			<id>dev</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<!-- db -->
+				<mysql.driver>com.mysql.cj.jdbc.Driver</mysql.driver>
+				<mysql.url>jdbc:mysql://localhost/mybatis?useUnicode=true&amp;characterEncoding=UTF-8&amp;useJDBCCompliantTimezoneShift=true&amp;useLegacyDatetimeCode=false&amp;serverTimezone=UTC&amp;nullNamePatternMatchesAll=true</mysql.url>
+				<mysql.userName>root</mysql.userName>
+				<mysql.password>123456</mysql.password>
+
+				<!--  MyBatis Generator  -->
+				<!--  Java接口和实体类  -->
+				<targetJavaProject>${basedir}/src/main/java</targetJavaProject>
+				<targetMapperPackage>com.github.generator.mapper</targetMapperPackage>
+				<targetModelPackage>com.github.generator</targetModelPackage>
+				<!--  XML生成路径  -->
+				<targetResourcesProject>${basedir}/src/main/resources</targetResourcesProject>
+				<targetXMLPackage>mapper</targetXMLPackage>
+			</properties>
+		</profile>
+	</profiles>
 </project>
