@@ -50,11 +50,9 @@
     <!--<bean id="springMapperScannerConfigurer" class="org.mybatis.spring.mapper.MapperScannerConfigurer">-->
         <!--<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>-->
         <!--<property name="basePackage" value="com.github.base.mapper"/>-->
-    <!-- <!bean>-->
+     <!--</bean>-->
 
     <bean id="commonMapperScannerConfigurer" class="tk.mybatis.spring.mapper.MapperScannerConfigurer">
-        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
         <property name="basePackage" value="com.**.mapper"/>
-        <!--<property name="markerInterface" valcom.github.spring.common.CommonMapperpper" />-->
     </bean>
 </beans>
