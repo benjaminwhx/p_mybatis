@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+		PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<settings>
+		<setting name="lazyLoadingEnabled" value="false" />
+		<setting name="multipleResultSetsEnabled" value="true" />
+		<setting name="useColumnLabel" value="true" />
+		<setting name="useGeneratedKeys" value="true" />
+		<setting name="autoMappingBehavior" value="PARTIAL" />
+		<setting name="defaultExecutorType" value="SIMPLE" />
+		<setting name="defaultStatementTimeout" value="25000" />
+		<setting name="cacheEnabled" value="true" />
+		<setting name="defaultExecutorType" value="REUSE" />
+	</settings>
+	<plugins>
+		<plugin interceptor="com.github.plugin.id.AutoIncrementKeyPlugin">
+			<!--属性idGen.type为外部自增长id生成服务类class-->
+			<property name="idGen.type" value="com.github.id.AtomicLongIDGen"/>
+			<!--要拦截insert操作的表配置， 以英文逗号或分号分隔， 若不指定拦截器将不工作。
+			student=id:id表示表student有主键的属性为id，数据库列名也为id
+			如果sql语句中的表名带有库名， 会去掉库名， 如： dms.send_d将使用send_d作为表名判断是否要拦截-->
+			<property name="interceptTableSettings" value="student=id:id"/>
+			<!-- 指定是否要替换sql语句中的xxx.NEXTVAL, 如果是oracle语法的sql，
+			要对此类语句做替换， 默认会做替换-->
+			<property name="replaceNextValue" value="true"/>
+			<!--表示如果已经设置了keyProperty的值， 是否还要新生成id， true表示是， false为否, 默认为false-->
+			<property name="replaceExistsNewId" value="true"/>
+		</plugin>
+	</plugins>
+
+	<environments default="development">
+		<environment id="development">
+			<!-- 在Configuration()方法中配置别名 -->
+			<transactionManager type="JDBC"/>
+			<dataSource type="POOLED">
+				<property name="driver" value="com.mysql.cj.jdbc.Driver"/>
+				<property name="url" value="jdbc:mysql://localhost/mybatis?useUnicode=true&amp;characterEncoding=UTF-8&amp;useJDBCCompliantTimezoneShift=true&amp;useLegacyDatetimeCode=false&amp;serverTimezone=UTC"/>
+				<property name="username" value="root"/>
+				<property name="password" value="123456"/>
+			</dataSource>
+		</environment>
+	</environments>
+
+	<databaseIdProvider type="DB_VENDOR">
+		<property name="SQL_Server" value="sqlserver"/>
+		<property name="DB2" value="db2"/>
+		<property name="Oracle" value="oracle"/>
+	</databaseIdProvider>
+
+	<mappers>
+		<mapper class="com.github.base.mapper.StudentMapper" />
+	</mappers>
+</configuration>

@@ -57,7 +57,7 @@ public class ReflectUtil {
 	 * @param fieldValue 目标值
 	 */
 	public static void setFieldValue(Object obj, String fieldName,
-									 String fieldValue) {
+									 Object fieldValue) {
 		Field field = ReflectUtil.getField(obj, fieldName);
 		if (field != null) {
 			try {

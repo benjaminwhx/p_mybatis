@@ -16,6 +16,7 @@
 		<module>mybatis-order</module>
 		<module>mybatis-mapper</module>
 		<module>mybatis-generator</module>
+		<module>mybatis-plugin</module>
 	</modules>
 	
 	<properties>
@@ -24,6 +25,12 @@
 	
 	<dependencyManagement>
 		<dependencies>
+			<dependency>
+				<groupId>junit</groupId>
+				<artifactId>junit</artifactId>
+				<version>4.12</version>
+				<scope>test</scope>
+			</dependency>
 			<!-- mybatis core -->
 			<dependency>
 				<groupId>org.mybatis</groupId>
