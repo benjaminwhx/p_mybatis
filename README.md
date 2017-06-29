@@ -21,6 +21,7 @@
 |mybatis-page |mybatis分页插件 |
 |mybatis-plugin |项目中各种插件的使用 |
 |mybatis-spring |spring中mybatis的使用 |
+|doc |文档以及源码分析 |
 
 ## 文档地址
 
