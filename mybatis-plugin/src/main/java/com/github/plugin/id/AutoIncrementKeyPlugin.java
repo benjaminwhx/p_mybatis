@@ -53,9 +53,6 @@ public class AutoIncrementKeyPlugin implements Interceptor {
 			initializeConfiguration();
 			logger.info("AutoIncrementKeyPlugin initialized");
 		}
-
-//		RoutingStatementHandler handler = (RoutingStatementHandler) invocation.getTarget();
-//		StatementHandler handlerInner = (StatementHandler) ReflectUtil.getFieldValue(handler, "delegate");
 		MappedStatement mappedStatement = (MappedStatement) invocation.getArgs()[0];
 
 		if (mappedStatement.getSqlCommandType() == SqlCommandType.INSERT) {

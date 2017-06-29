@@ -1,6 +1,4 @@
-package com.github.id;
-
-import com.github.plugin.id.IDGen;
+package com.github.plugin.id;
 
 import java.util.concurrent.atomic.AtomicLong;
 

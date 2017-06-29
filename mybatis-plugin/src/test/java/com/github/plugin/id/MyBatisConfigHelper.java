@@ -1,4 +1,4 @@
-package com.github.id;
+package com.github.plugin.id;
 
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;

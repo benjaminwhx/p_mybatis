@@ -1,4 +1,4 @@
-package com.github.id;
+package com.github.plugin.id;
 
 import com.github.base.bean.Student;
 import com.github.base.mapper.StudentMapper;

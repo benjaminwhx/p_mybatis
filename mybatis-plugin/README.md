@@ -9,7 +9,7 @@
 
 ```
 <plugins>
-    <plugin interceptor="com.jd.coo.sa.mybatis.plugins.id.AutoIncrementKeyPlugin">
+    <plugin interceptor="com.github.plugin.id.AutoIncrementKeyPlugin">
         <!--属性idGen.type为外部自增长id生成服务类class-->
         <property name="idGen.type" value="com.jd.coo.sa.mybatis.plugins.test.AtomicLongIDGen"/>
         <!--要拦截insert操作的表配置， 以英文逗号或分号分隔， 若不指定拦截器将不工作。
@@ -25,3 +25,20 @@
 </plugins>
 ```
 
+## 2、监控sql异常， 慢sql， 连接数报警插件使用
+
+通过mybatis插件拦截Executor接口的query和update方法， 在执行时做异常捕获， 慢sql统计， 以及连接数阀值监控。
+
+配置如下：
+
+```
+<plugins>
+    <plugin interceptor="com.github.plugin.monitor.MonitorInterceptor">
+        <property name="sqlExceptionEnabled" value="true"/>
+        <property name="slowSqlEnabled" value="true"/>
+        <property name="slowSqlTimeout" value="21"/>
+        <property name="tooManyActiveConnectionEnabled" value="true"/>
+        <property name="maxActiveConnectionRatio" value="0.8"/>
+    </plugin>
+</plugins>
+```
