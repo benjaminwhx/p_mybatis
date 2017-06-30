@@ -3,6 +3,9 @@ package com.github.base.mapper;
 import com.github.base.bean.Student;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Select;
+
+import java.util.List;
 
 /**
  * User: 吴海旭
@@ -16,4 +19,7 @@ public interface StudentMapper {
 
 	@Delete("delete from student")
 	int deleteAll();
+
+	@Select("select * from student")
+	List<Student> selectAll();
 }
