@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import java.util.List;
@@ -26,10 +27,12 @@ public class UserLoginService {
 	@Autowired
 	private UserLoginMapper userLoginMapper;
 
+	@Transactional(readOnly = true)
 	public List<UserLogin> getAllUserLogins() {
 		return userLoginMapper.selectAll();
 	}
 
+	@Transactional(readOnly = true)
 	public List<UserLogin> getUsersByPage(int pageNo, int pageSize) {
         PageHelper.startPage(pageNo, pageSize, false);
 	    return userLoginMapper.selectAll();

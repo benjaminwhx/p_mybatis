@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd  http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd"
+	   default-lazy-init="false">
+
+	<context:component-scan base-package="com.github.plugin"/>
+
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+	    <property name="location" value="classpath:/dbConfig.properties" />
+    </bean>
+
+    <bean id="baseDataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="${mysql.driver}" />
+        <!-- 连接初始值，连接池启动时创建的连接数量的初始值 -->
+        <property name="initialSize" value="${mysql.initialSize}" />
+        <!-- 连接池的最大值，同一时间可以从池分配的最多连接数量，0时无限制 -->
+        <property name="maxActive" value="${mysql.maxActive}" />
+        <!-- 最大空闲值.当经过一个高峰时间后，连接池可以慢慢将已经用不到的连接慢慢释放一部分，一直减少到maxIdle为止 ，0时无限制-->
+        <property name="maxIdle" value="${mysql.maxIdle}" />
+        <!-- 最小空闲值.当空闲的连接数少于阀值时，连接池就会预申请去一些连接，以免洪峰来时来不及申请 -->
+        <property name="minIdle" value="${mysql.minIdle}" />
+        <!-- 是否对已备语句进行池管理（布尔值），是否对PreparedStatement进行缓存 -->
+        <property name="poolPreparedStatements" value="${mysql.poolPreparedStatements}" />
+        <!-- 是否对sql进行自动提交 -->
+        <property name="defaultAutoCommit" value="${mysql.defaultAutoCommit}" />
+    </bean>
+
+	<bean id="dataSource-master" parent="baseDataSource">
+		<property name="url" value="${mysql.url}" />
+		<property name="username" value="${mysql.userName}" />
+		<property name="password" value="${mysql.password}" />
+	</bean>
+
+	<bean id="dataSource-slave" parent="baseDataSource">
+		<property name="url" value="${mysql.url}" />
+		<property name="username" value="${mysql.userName}" />
+		<property name="password" value="${mysql.password}" />
+	</bean>
+
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource-master" />
+    </bean>
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSourceRW" />
+        <property name="configLocation" value="classpath:mybatis-config/rwConfig.xml" />
+		<property name="mapperLocations">
+			<array>
+				<value>classpath:mapper/*.xml</value>
+			</array>
+		</property>
+    </bean>
+
+    <!-- mybatis结合spring配置，basePackage可以把mapper类交由spring管理，并在mybatis中注册 -->
+    <bean id="springMapperScannerConfigurer" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+        <property name="basePackage" value="com.github.base.mapper"/>
+     </bean>
+</beans>
