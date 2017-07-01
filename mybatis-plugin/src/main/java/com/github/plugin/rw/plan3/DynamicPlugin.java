@@ -1,52 +1,72 @@
 package com.github.plugin.rw.plan3;
 
-import com.github.base.util.ReflectUtil;
-import org.apache.ibatis.executor.statement.RoutingStatementHandler;
-import org.apache.ibatis.executor.statement.StatementHandler;
+import org.apache.ibatis.executor.Executor;
+import org.apache.ibatis.executor.keygen.SelectKeyGenerator;
+import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.plugin.*;
-import org.springframework.util.ReflectionUtils;
+import org.apache.ibatis.session.ResultHandler;
+import org.apache.ibatis.session.RowBounds;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
-import java.sql.Connection;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * User: 吴海旭
  * Date: 2017-07-01
- * Time: 下午5:38
+ * Time: 下午6:18
  */
-@Intercepts({@Signature(type = StatementHandler.class, method = "prepare", args = {Connection.class})})
+@Intercepts({
+        @Signature(type = Executor.class, method = "update", args = {
+                MappedStatement.class, Object.class }),
+        @Signature(type = Executor.class, method = "query", args = {
+                MappedStatement.class, Object.class, RowBounds.class,
+                ResultHandler.class }) })
 public class DynamicPlugin implements Interceptor {
+    protected static final Logger logger = LoggerFactory.getLogger(DynamicPlugin.class);
+
+    private static final String REGEX = ".*insert\\u0020.*|.*delete\\u0020.*|.*update\\u0020.*";
+
+    private static final Map<String, DynamicDataSourceGlobal> cacheMap = new ConcurrentHashMap<>();
+
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
-        //如果是采用了我们代理,则路由    数据源
-        Connection conn = (Connection)invocation.getArgs()[0];
-        if(conn instanceof ConnectionProxy){
-            StatementHandler statementHandler = (StatementHandler) invocation
-                    .getTarget();
 
-            MappedStatement mappedStatement = null;
-            if (statementHandler instanceof RoutingStatementHandler) {
-                StatementHandler delegate = (StatementHandler) ReflectUtil
-                        .getFieldValue(statementHandler, "delegate");
-                mappedStatement = (MappedStatement) ReflectUtil.getFieldValue(
-                        delegate, "mappedStatement");
-            } else {
-                mappedStatement = (MappedStatement) ReflectUtil.getFieldValue(
-                        statementHandler, "mappedStatement");
+        boolean synchronizationActive = TransactionSynchronizationManager.isSynchronizationActive();
+        if(!synchronizationActive) {
+            Object[] objects = invocation.getArgs();
+            MappedStatement ms = (MappedStatement) objects[0];
+
+            DynamicDataSourceGlobal dynamicDataSourceGlobal = null;
+
+            if((dynamicDataSourceGlobal = cacheMap.get(ms.getId())) == null) {
+                //读方法
+                if(ms.getSqlCommandType().equals(SqlCommandType.SELECT)) {
+                    //!selectKey 为自增id查询主键(SELECT LAST_INSERT_ID() )方法，使用主库
+                    if(ms.getId().contains(SelectKeyGenerator.SELECT_KEY_SUFFIX)) {
+                        dynamicDataSourceGlobal = DynamicDataSourceGlobal.WRITE;
+                    } else {
+                        BoundSql boundSql = ms.getSqlSource().getBoundSql(objects[1]);
+                        String sql = boundSql.getSql().toLowerCase(Locale.CHINA).replaceAll("[\\t\\n\\r]", " ");
+                        if(sql.matches(REGEX)) {
+                            dynamicDataSourceGlobal = DynamicDataSourceGlobal.WRITE;
+                        } else {
+                            dynamicDataSourceGlobal = DynamicDataSourceGlobal.READ;
+                        }
+                    }
+                }else{
+                    dynamicDataSourceGlobal = DynamicDataSourceGlobal.WRITE;
+                }
+                logger.warn("设置方法[{}] use [{}] Strategy, SqlCommandType [{}]..", ms.getId(), dynamicDataSourceGlobal.name(), ms.getSqlCommandType().name());
+                cacheMap.put(ms.getId(), dynamicDataSourceGlobal);
             }
-            String key = AbstractDynamicDataSourceProxy.WRITE;
-
-            if(mappedStatement.getSqlCommandType() == SqlCommandType.SELECT){
-                key = AbstractDynamicDataSourceProxy.READ;
-            }else{
-                key = AbstractDynamicDataSourceProxy.WRITE;
-            }
-
-            ConnectionProxy connectionProxy = (ConnectionProxy)conn;
-            connectionProxy.getTargetConnection(key);
-
+            DynamicDataSourceHolder.putDataSource(dynamicDataSourceGlobal);
         }
 
         return invocation.proceed();
@@ -54,11 +74,15 @@ public class DynamicPlugin implements Interceptor {
 
     @Override
     public Object plugin(Object target) {
-        return Plugin.wrap(target, this);
+        if (target instanceof Executor) {
+            return Plugin.wrap(target, this);
+        } else {
+            return target;
+        }
     }
 
     @Override
     public void setProperties(Properties properties) {
-
+        //
     }
 }

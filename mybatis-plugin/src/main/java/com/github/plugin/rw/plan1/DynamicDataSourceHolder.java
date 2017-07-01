@@ -1,6 +1,4 @@
-package com.github.plugin.rw.plan4;
-
-import com.github.plugin.rw.plan4.DynamicDataSourceGlobal;
+package com.github.plugin.rw.plan1;
 
 /**
  * User: 吴海旭

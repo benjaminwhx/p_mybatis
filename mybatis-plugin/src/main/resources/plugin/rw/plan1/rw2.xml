@@ -47,7 +47,7 @@
     </bean>
 
     <!-- spring动态数据源，根据规则动态切换主从 -->
-    <bean id="dataSource" class="com.github.plugin.rw.plan2.DynamicDataSource">
+    <bean id="dataSource" class="com.github.plugin.rw.plan1.DynamicDataSource">
         <property name="writeDataSource" ref="dataSource-write" />
         <property name="readDataSources">
             <list>

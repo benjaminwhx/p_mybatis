@@ -1,4 +1,4 @@
-package com.github.plugin.rw.plan2;
+package com.github.plugin.rw.plan1;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

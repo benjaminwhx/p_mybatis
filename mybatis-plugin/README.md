@@ -42,3 +42,7 @@
     </plugin>
 </plugins>
 ```
+
+## 3、主从配置插件
+
+详细的看com/github/plugin/rw下的配置

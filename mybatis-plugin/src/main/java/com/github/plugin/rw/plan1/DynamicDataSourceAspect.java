@@ -1,4 +1,4 @@
-package com.github.plugin.rw.plan2;
+package com.github.plugin.rw.plan1;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.After;

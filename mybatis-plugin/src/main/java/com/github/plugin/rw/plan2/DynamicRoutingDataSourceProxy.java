@@ -1,4 +1,4 @@
-package com.github.plugin.rw.plan3;
+package com.github.plugin.rw.plan2;
 
 import javax.sql.DataSource;
 import java.util.concurrent.ThreadLocalRandom;

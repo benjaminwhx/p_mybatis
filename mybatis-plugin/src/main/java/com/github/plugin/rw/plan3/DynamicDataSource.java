@@ -1,4 +1,4 @@
-package com.github.plugin.rw.plan4;
+package com.github.plugin.rw.plan3;
 
 import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 

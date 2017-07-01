@@ -1,4 +1,4 @@
-package com.github.plugin.rw.plan4;
+package com.github.plugin.rw.plan1;
 
 /**
  * User: 吴海旭
