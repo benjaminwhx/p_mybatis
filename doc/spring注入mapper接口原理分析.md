@@ -383,6 +383,8 @@ private void processBeanDefinitions(Set<BeanDefinitionHolder> beanDefinitions) {
 
 可以发现上面利用beanDefinition构造MapperFactoryBean，传入一系列的参数，如果是一个SqlSessionFactory的情况，可以不用设置SqlSessionFactory和SqlSessionTemplate，spring会自动注入类型相同的类，那么MapperFactoryBean是如何运作的？spring是如何把MapperFactoryBean注入到各个接口的？
 
+### 4.注入原理分析
+
 ```
 public class MapperFactoryBean<T> extends SqlSessionDaoSupport implements FactoryBean<T> {
 }
