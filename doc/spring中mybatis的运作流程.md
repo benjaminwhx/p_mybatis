@@ -1,4 +1,6 @@
-# MapperScannerConfigurer执行原理分析
+# spring中mybatis的运作流程
+
+mybatis结合spring入口在`MapperScannerConfigurer`，我们看看它到底做了什么，让spring轻易的把mybatis无缝衔接。
 
 ### 1.processPropertyPlaceHolders属性的处理
 
@@ -338,8 +340,9 @@ private void processBeanDefinitions(Set<BeanDefinitionHolder> beanDefinitions) {
 
       // the mapper interface is the original class of the bean
       // but, the actual class of the bean is MapperFactoryBean
-      // 开始构造MapperFactoryBean类型的bean.
+      // 开始构造MapperFactoryBean类型的bean.设置bean的构造函数传入mapper接口作为参数
       definition.getConstructorArgumentValues().addGenericArgumentValue(definition.getBeanClassName()); // issue #59
+      // bean的真实类型由mapper接口统一换为MapperFactoryBean
       definition.setBeanClass(this.mapperFactoryBean.getClass());
 
       definition.getPropertyValues().add("addToConfig", this.addToConfig);
@@ -367,6 +370,7 @@ private void processBeanDefinitions(Set<BeanDefinitionHolder> beanDefinitions) {
         explicitFactoryUsed = true;
       }
 
+      // 如果没有设置SqlSessionFactory或者SqlSessionTemplate，按类型注入
       if (!explicitFactoryUsed) {
         if (logger.isDebugEnabled()) {
           logger.debug("Enabling autowire by type for MapperFactoryBean with name '" + holder.getBeanName() + "'.");
@@ -377,7 +381,7 @@ private void processBeanDefinitions(Set<BeanDefinitionHolder> beanDefinitions) {
   }
 ```
 
-上面利用beanDefinition构造MapperFactoryBean，那么MapperFactoryBean是如何运作的？
+可以发现上面利用beanDefinition构造MapperFactoryBean，传入一系列的参数，如果是一个SqlSessionFactory的情况，可以不用设置SqlSessionFactory和SqlSessionTemplate，spring会自动注入类型相同的类，那么MapperFactoryBean是如何运作的？spring是如何把MapperFactoryBean注入到各个接口的？
 
 ```
 public class MapperFactoryBean<T> extends SqlSessionDaoSupport implements FactoryBean<T> {
@@ -433,4 +437,20 @@ public abstract class DaoSupport implements InitializingBean {
   }
 ```
 
-至此，MapperScannerConfigurer原理分析结束。可以看出，mybatis通过一个包名先是得到下面所有的类，注册到spring容器中。最后再把对应的mapper接口放入configuration中。这样我们就可以直接在代码中引入Mapper接口来使用了。
+mybatis最后把mapper接口和xml文件关联起来`configuration.addMapper(this.mapperInterface)`，我们关注到，MapperFactoryBean实现了FactoryBean接口，我们看看对应的方法。
+
+```
+@Override
+  public T getObject() throws Exception {
+    return getSqlSession().getMapper(this.mapperInterface);
+  }
+
+  @Override
+  public Class<T> getObjectType() {
+    return this.mapperInterface;
+  }
+```
+
+可以看到，mybatis利用FactoryBean让spring对每个接口类返回不同的类型，并且注入的都是mybatis动态代理得到的MapperProxy。
+
+至此，MapperScannerConfigurer原理分析结束。可以看出，mybatis通过一个包名先是得到下面所有的类，注册到spring容器中。然后再把对应的mapper接口放入configuration中，最后根据FactoryBean去获取真实的类型和值去注入，这样我们就可以直接在代码中引入Mapper接口来使用了。
