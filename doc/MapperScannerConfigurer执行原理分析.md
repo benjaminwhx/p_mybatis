@@ -96,6 +96,7 @@ public void registerFilters() {
     // 想要的效果，而封装此属性的过滤器就是AnnotationTypeFilter.AnnotationTypeFilter保证在扫描对应
     // java文件时只接受标记有注解为annotationClass接口 
     if (this.annotationClass != null) {
+      // 把annotationClass加入includeFilter中
       addIncludeFilter(new AnnotationTypeFilter(this.annotationClass));
       acceptAllInterfaces = false;
     }
@@ -105,6 +106,7 @@ public void registerFilters() {
       addIncludeFilter(new AssignableTypeFilter(this.markerInterface) {
         @Override
         protected boolean matchClassName(String className) {
+          // 对于markerInterface返回false，其他实现它接口的类都通过
           return false;
         }
       });
@@ -119,6 +121,7 @@ public void registerFilters() {
       addIncludeFilter(new TypeFilter() {
         @Override
         public boolean match(MetadataReader metadataReader, MetadataReaderFactory metadataReaderFactory) throws IOException {
+          // mybatis让spring扫描mapper接口的时候匹配规则的时候都通过
           return true;
         }
       });
@@ -135,7 +138,7 @@ public void registerFilters() {
   }
 ```
 
-从上面的函数我们可以看出，控制扫描文件Spring通过不同的过滤器完成，这些定义的过滤器记录在了includeFilters和excludeFilters属性中。
+从上面的函数我们可以看出，控制扫描文件Spring通过不同的过滤器完成，这些定义的过滤器记录在了includeFilters和excludeFilters属性中。如果没有配置annotationClass和markerInterface，默认全部扫描所有的mapper接口。
 
 ```
 public void addIncludeFilter(TypeFilter includeFilter){
@@ -149,7 +152,7 @@ public void addExcludeFilter(TypeFilter excludeFilter){
 
 ### 3.扫描java文件
 
-设置了相关属性以及生成了对应的过滤器后就可以进行文件的扫描了，扫描工作是有ClassPathMapperScanner类的父类ClassPathBeanDefinitionScanner的scan方法完成的。
+设置了相关属性以及生成了对应的过滤器后就可以进行文件的扫描了，扫描工作是有ClassPathMapperScanner类的父类ClassPathBeanDefinitionScanner（spring的类）的scan方法完成的。
 
 ```
 public int scan(String... basePackages) {
@@ -166,7 +169,7 @@ public int scan(String... basePackages) {
 }
 ```
 
-scan是个全局方法，扫描工作通过`doScan(basePackages)`委托给了doScan方法，同时，还包括了includeAnnotationConfig属性的处理，AnnotationConfigUtils.registerAnnotationConfigProcessors(this.registry);代码主要是完成对于注解处理器的简单注册，我们下面主要分析下扫描功能的实现。
+scan是个全局方法，扫描工作通过`doScan(basePackages)`委托给了doScan方法，同时，还包括了includeAnnotationConfig属性的处理，AnnotationConfigUtils.registerAnnotationConfigProcessors(this.registry);代码主要是完成对于注解处理器的简单注册，我们下面主要分析下扫描功能的实现。这个方法在mybatis的`ClassPathMapperScanner`这个类里。
 
 ```
 @Override
@@ -185,14 +188,14 @@ scan是个全局方法，扫描工作通过`doScan(basePackages)`委托给了doS
   }
   ```
   
-此时，虽然还没有完成介绍到扫描的过程，但是我们也应该理解了Spring中对于自动扫描的注册，声明MapperScannerConfigurer类型的bean目的是不需要我们对于每个接口都注册一个MapperFactoryBean类型的对应的bean，但是，不再配置文件中注册并不代表这个bean不存在，而是在扫描的过程中通过编码的方式动态注册。实现过程我们在上面的函数中可以看得非常清楚。
+我们可以看到mybatis自己实现的doScan方法先调用了spring的doScan方法（spring扫描通用接口，@Controller、@Service、@Component都是走这里扫描），然后拿到了过滤后的beanDefinition集合，然后进行处理。
   
 ```
 protected Set<BeanDefinitionHolder> doScan(String... basePackages) {
     Assert.notEmpty(basePackages, "At least one base package must be specified");
     Set<BeanDefinitionHolder> beanDefinitions = new LinkedHashSet<BeanDefinitionHolder>();
     for (String basePackage : basePackages) {
-        // 扫描basePackage路径下的java文件
+        // 扫描basePackage路径下的java文件，找出候选组件
         Set<BeanDefinition> candidates = findCandidateComponents(basePackage);
         for (BeanDefinition candidate : candidates) {
             //解析scope属性
@@ -220,6 +223,7 @@ protected Set<BeanDefinitionHolder> doScan(String... basePackages) {
     return beanDefinitions;
 }
 ```
+我们可以看到最重要的就是`findCandidateComponents`这个方法，它主要过滤了一些不通过的bean，最后把通过的全部返回。我们来看看是怎么处理这些组件的。
 
 ```
 public Set<BeanDefinition> findCandidateComponents(String basePackage) {
@@ -237,10 +241,12 @@ public Set<BeanDefinition> findCandidateComponents(String basePackage) {
             if (resource.isReadable()) {
                 try {
                     MetadataReader metadataReader = this.metadataReaderFactory.getMetadataReader(resource);
+                    // 过滤方法1
                     if (isCandidateComponent(metadataReader)) {
                         ScannedGenericBeanDefinition sbd = new ScannedGenericBeanDefinition(metadataReader);
                         sbd.setResource(resource);
                         sbd.setSource(resource);
+                        // 过滤方法2
                         if (isCandidateComponent(sbd)) {
                             if (debugEnabled) {
                                 logger.debug("Identified candidate component class: " + resource);
@@ -278,9 +284,12 @@ public Set<BeanDefinition> findCandidateComponents(String basePackage) {
 }
 ```
 
-findCandidateComponents方法根据传入的包路径信息并结合类文件路径拼接成文件的绝对路径，同时完成了文件的扫描过程并且根据对应的文件生成了对应的bean,使用ScannedGenericBeanDefinition类型的bean承载信息，bean中值记录了resource和source信息。这里，我们更感兴趣的是isCandidateCompanent(metadataReader)，此句代码用于判断当前扫描的文件是否符合要求，而我们之前注册的过滤器也是在此派上用场的。
+findCandidateComponents方法根据传入的包路径信息并结合类文件路径拼接成文件的绝对路径，同时完成了文件的扫描过程并且根据对应的文件生成了对应的bean,使用ScannedGenericBeanDefinition类型的bean承载信息，bean中值记录了resource和source信息。这里，我们更感兴趣的是isCandidateCompanent(metadataReader)，此句代码用于判断当前扫描的文件是否符合要求，而我们之前注册的过滤器也是在此派上用场的。我们来看看对应的过滤方法1和2.
 
 ```
+/**
+ * 根据之前加入的filter过滤出符合条件的。
+ */
 protected boolean isCandidateComponent(MetadataReader metadataReader) throws IOException {
     for (TypeFilter tf : this.excludeFilters) {
         if (tf.match(metadataReader, this.metadataReaderFactory)) {
@@ -294,7 +303,25 @@ protected boolean isCandidateComponent(MetadataReader metadataReader) throws IOE
     }
     return false;
 }
+
+/**
+ * spring默认的过滤方法2，mybatis要实现对接口的扫描，这个方法不能用，mybatis对它进行了重写
+ * 重写的方法在下面。
+ */
+protected boolean isCandidateComponent(AnnotatedBeanDefinition beanDefinition) {
+		AnnotationMetadata metadata = beanDefinition.getMetadata();
+		return (metadata.isIndependent() && (metadata.isConcrete() ||
+				(metadata.isAbstract() && metadata.hasAnnotatedMethods(Lookup.class.getName()))));
+}
+
+@Override
+  protected boolean isCandidateComponent(AnnotatedBeanDefinition beanDefinition) {
+    // 是接口就通过
+    return beanDefinition.getMetadata().isInterface() && beanDefinition.getMetadata().isIndependent();
+  }
 ```
+
+我们看到mybatis重写了isCandidateComponent方法来让spring通过过滤。
 
 现在扫描完毕，开始注册mapper到configuration中去。
 
