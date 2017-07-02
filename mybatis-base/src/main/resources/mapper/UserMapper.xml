@@ -39,9 +39,9 @@
 		<result property="sex" column="sex" javaType="sex" jdbcType="INTEGER" typeHandler="com.github.base.typeHandler.MySexTypeHandler" />
 		<result property="roleId" column="role_id" javaType="java.lang.Long" jdbcType="BIGINT" />
 		<!-- 多对一查询 -->
-		<association property="role" column="role_id" fetchType="lazy" select="com.github.base.mapper.RoleMapper.findRoleById"/>
+		<!--<association property="role" column="role_id" fetchType="lazy" select="com.github.base.mapper.RoleMapper.findRoleById"/>-->
 		<!-- 通过id查询List<Order> 关联order的uid字段，实现多对一映射 -->
-		<collection property="orderList" select="com.github.base.mapper.OrderMapper.getOrdersByUid" ofType="order" column="id" fetchType="lazy"/>
+		<!--<collection property="orderList" select="com.github.base.mapper.OrderMapper.getOrdersByUid" ofType="order" column="id" fetchType="lazy"/>-->
 	</resultMap>
 	
 	<insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="user">
@@ -115,7 +115,7 @@
 				user_name = #{userName},
 			</if>
 			<if test="sex != null">
-				sex = #{sex, javaType=com.github.base.bean.SEX, jdbcType=INTEGER, typeHandler=com.github.base.typeHandler.MySexHandler},
+				sex = #{sex, javaType=com.github.base.bean.SEX, jdbcType=INTEGER, typeHandler=com.github.base.typeHandler.MySexTypeHandler},
 			</if>
 			<if test="roleId != null">
 				role_id = #{roleId},

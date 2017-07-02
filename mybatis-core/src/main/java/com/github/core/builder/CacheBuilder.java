@@ -2,11 +2,15 @@ package com.github.core.builder;
 
 import com.github.base.bean.User;
 import com.github.base.mapper.UserMapper;
+import com.github.base.util.JSONUtil;
 import com.github.core.util.MyBatisConfigHelper;
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * User: 吴海旭
@@ -45,7 +49,36 @@ public class CacheBuilder {
 		sqlSession2.close();
 	}
 
-	public static void main(String[] args) {
-		new CacheBuilder().testOneAndTwoLevelCache();
+    /**
+     * 不同的SqlSession会产生脏数据问题
+     * @throws InvocationTargetException
+     * @throws IllegalAccessException
+     */
+	private void testMultiSqlSessionIsolation() throws InvocationTargetException, IllegalAccessException {
+		SqlSessionFactory sqlSessionFactory = MyBatisConfigHelper.getSqlSessionFactory();
+		SqlSession sqlSession1 = sqlSessionFactory.openSession();
+		SqlSession sqlSession2 = sqlSessionFactory.openSession();
+        UserMapper mapper1 = sqlSession1.getMapper(UserMapper.class);
+        UserMapper mapper2 = sqlSession2.getMapper(UserMapper.class);
+
+        User user = mapper1.getUserByUserId(2L);
+
+        logger.info("user1: " + JSONUtil.bean2Json(user));
+        User user2 = new User();
+        BeanUtils.copyProperties(user2, user);
+        user2.setUserName("Lucy_update");
+
+        logger.info("user2: " + JSONUtil.bean2Json(user2));
+        mapper2.update(user2);
+        sqlSession2.commit();
+
+        User user3 = mapper1.getUserByUserId(2L);
+        logger.info("user3: " + JSONUtil.bean2Json(user3));
+        sqlSession1.commit();
+    }
+
+	public static void main(String[] args) throws InvocationTargetException, IllegalAccessException {
+//		new CacheBuilder().testOneAndTwoLevelCache();
+		new CacheBuilder().testMultiSqlSessionIsolation();
 	}
 }
