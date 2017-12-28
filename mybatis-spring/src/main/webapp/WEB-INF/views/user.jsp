@@ -15,5 +15,6 @@
 <c:forEach items="${userList}" var="user">
 	<div>${user.userName}是${user.role.roleName}</div> <br/>
 </c:forEach>
+<div>role: ${role.roleName}</div>
 </body>
 </html>
