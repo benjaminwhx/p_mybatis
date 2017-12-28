@@ -8,32 +8,33 @@
 		<property name="beginningDelimiter" value="`" />
 		<property name="endingDelimiter" value="`" />
 		
-		<commentGenerator>
-			<property name="suppressAllComments" value="true"/>
-			<property name="suppressDate" value="true"/>
-		</commentGenerator>
+		<!--<commentGenerator>-->
+			<!--<property name="suppressAllComments" value="true"/>-->
+			<!--<property name="suppressDate" value="true"/>-->
+		<!--</commentGenerator>-->
+		<commentGenerator type="com.github.generator.MyCommentGenerator"></commentGenerator>
 		
 		<jdbcConnection driverClass="com.mysql.cj.jdbc.Driver"
-		                connectionURL="jdbc:mysql://localhost/mybatis?useUnicode=true&amp;characterEncoding=UTF-8&amp;useJDBCCompliantTimezoneShift=true&amp;useLegacyDatetimeCode=false&amp;serverTimezone=UTC"
-		                userId="root"
-		                password="123456">
+		                connectionURL="jdbc:mysql://172.25.28.8:3306/overseas_iou?useUnicode=true&amp;characterEncoding=UTF-8&amp;useJDBCCompliantTimezoneShift=true&amp;useLegacyDatetimeCode=false&amp;serverTimezone=UTC"
+		                userId="m_overseas_iou"
+		                password="wEXKYs">
 		</jdbcConnection>
 		
 		<javaTypeResolver >
 			<property name="forceBigDecimals" value="false" />
 		</javaTypeResolver>
 		
-		<javaModelGenerator targetPackage="com.github.generator" targetProject="C:\Users\Administrator\IdeaProjects\mybatis\mybatis-generator\src\main\java">
+		<javaModelGenerator targetPackage="com.github.generator.domain" targetProject="C:\Users\wuhaixu\IdeaProjects\mybatis\mybatis-generator\src\main\java">
 			<property name="enableSubPackages" value="true" />
 			<property name="trimStrings" value="true" />
 		</javaModelGenerator>
 		
-		<sqlMapGenerator targetPackage="mapper"  targetProject="C:\Users\Administrator\IdeaProjects\mybatis\mybatis-generator\src\main\resources">
+		<sqlMapGenerator targetPackage="mapper"  targetProject="C:\Users\wuhaixu\IdeaProjects\mybatis\mybatis-generator\src\main\resources">
 			<property name="enableSubPackages" value="true" />
 		</sqlMapGenerator>
 		
 		<javaClientGenerator type="XMLMAPPER" targetPackage="com.github.generator.mapper"
-		                     targetProject="C:\Users\Administrator\IdeaProjects\mybatis\mybatis-generator\src\main\java"/>
+		                     targetProject="C:\Users\wuhaixu\IdeaProjects\mybatis\mybatis-generator\src\main\java"/>
 		
 		<!--
 			tableName="%" 生成全部表，可以使用SQL通配符匹配多个表
@@ -43,13 +44,37 @@
 				[^charlist]或者[!charlist] 不在字符列中的任何单一字符
 			
 		-->
-		<table tableName="cf_user" domainObjectName="User">
+		<table tableName="ocf_apply" domainObjectName="ApplyOrder">
 			<generatedKey column="id" sqlStatement="JDBC"/>
 		</table>
-		<table tableName="cf_order" domainObjectName="Order">
+		<table tableName="ocf_bill" domainObjectName="Bill">
 			<generatedKey column="id" sqlStatement="JDBC"/>
 		</table>
-		<table tableName="cf_role" domainObjectName="Role">
+		<table tableName="ocf_bill_serial" domainObjectName="BillSerial">
+			<generatedKey column="id" sqlStatement="JDBC"/>
+		</table>
+		<table tableName="ocf_carryover_bill" domainObjectName="CarryoverBill">
+			<generatedKey column="id" sqlStatement="JDBC"/>
+		</table>
+		<table tableName="ocf_daily_interest" domainObjectName="DailyInterest">
+			<generatedKey column="id" sqlStatement="JDBC"/>
+		</table>
+		<table tableName="ocf_loan" domainObjectName="Loan">
+			<generatedKey column="id" sqlStatement="JDBC"/>
+		</table>
+		<table tableName="ocf_penalty" domainObjectName="Penalty">
+			<generatedKey column="id" sqlStatement="JDBC"/>
+		</table>
+		<table tableName="ocf_plan" domainObjectName="Plan">
+			<generatedKey column="id" sqlStatement="JDBC"/>
+		</table>
+		<table tableName="ocf_repayment" domainObjectName="RepaymentOrder">
+			<generatedKey column="id" sqlStatement="JDBC"/>
+		</table>
+		<table tableName="ocf_reverse_bill" domainObjectName="ReverseBill">
+			<generatedKey column="id" sqlStatement="JDBC"/>
+		</table>
+		<table tableName="ofc_refund" domainObjectName="RefundOrder">
 			<generatedKey column="id" sqlStatement="JDBC"/>
 		</table>
 	</context>

@@ -8,10 +8,11 @@
 		<property name="beginningDelimiter" value="`" />
 		<property name="endingDelimiter" value="`" />
 		
-		<commentGenerator>
-			<property name="suppressAllComments" value="true"/>
-			<property name="suppressDate" value="true"/>
-		</commentGenerator>
+		<!--<commentGenerator>-->
+			<!--<property name="suppressAllComments" value="true"/>-->
+			<!--<property name="suppressDate" value="true"/>-->
+		<!--</commentGenerator>-->
+		<commentGenerator type="com.github.generator.MyCommentGenerator"></commentGenerator>
 		
 		<jdbcConnection driverClass="${mysql.driver}" connectionURL="${mysql.url}" userId="${mysql.userName}" password="${mysql.password}">
 		</jdbcConnection>
