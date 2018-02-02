@@ -1,12 +1,10 @@
-# spring注入mapper接口原理分析
+mybatis结合spring的入口在是 `MapperScannerConfigurer` 这个类，我们看看它到底做了什么，让spring轻易的把mybatis无缝衔接的。
 
-mybatis结合spring入口在`MapperScannerConfigurer`，我们看看它到底做了什么，让spring轻易的把mybatis无缝衔接。
-
-### 1.processPropertyPlaceHolders属性的处理
+# 1.processPropertyPlaceHolders属性的处理
 
 我们在集成mybatis-spring的时候，大多数都会使用这么一个配置来扫描mapper class，那么mybatis是如何来扫描它们并放入spring的呢？我们来看看MapperScannerConfigurer这个类的源码，首先因为MapperScannerConfigurer实现了BeanDefinitionRegistryPostProcessor这个接口，并实现了postProcessBeanDefinitionRegistry这个方法，在spring初始化的时候将bean以及bean的一些属性信息保存至BeanDefinitionHolder中。
 
-```
+```java
 public class MapperScannerConfigurer implements BeanDefinitionRegistryPostProcessor, InitializingBean, ApplicationContextAware, BeanNameAware{
       ...
     
@@ -70,9 +68,9 @@ public class MapperScannerConfigurer implements BeanDefinitionRegistryPostProces
 }
 ```
 
-postProcessBeanDefinitionRegistry方法在一开始通过判断processPropertyPlaceHolders是不是true，如果配置为true，就会执行值替换通配符的逻辑，因为postProcessBeanDefinitionRegistry方法会在postProcessBeanFactory方法前执行，所以这里手动调用了postProcessBeanFactory来提前替换通配符。所以当你用配置文件去管理这些property的值的时候，这个配置才有用。否则不用配置。下面是使用的示例：
+`postProcessBeanDefinitionRegistry` 方法在一开始通过判断 `processPropertyPlaceHolders` 是不是true，如果配置为true，就会执行值替换通配符的逻辑，因为 `postProcessBeanDefinitionRegistry` 方法会在 `postProcessBeanFactory` 方法前执行，所以这里手动调用了 `postProcessBeanFactory` 来提前替换通配符。所以当你用配置文件去管理这些property的值的时候，这个配置才有用。否则不用配置。下面是使用的示例：
 
-```
+```java
 <bean id="commonMapperScannerConfigurer" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
     <property name="sqlSessionFactoryBeanName" value="#{sqlSessionFactoryBeanName}"/>
     <property name="basePackage" value="${basePackage}"/>
@@ -85,11 +83,11 @@ sqlSessionFactoryBeanName=sqlSessionFactory
 
 ```
 
-接下来注册ClassPathMapperScanner，并且设置配置的值，并且注册过滤器scan.registerFilters()和扫描scan.scan(...)，下面将详细解释这两个方法。
+接下来注册 `ClassPathMapperScanner` ，并且设置配置的值，并且注册过滤器 `scan.registerFilters()` 和扫描 `scan.scan(...)` ，下面将详细解释这两个方法。
 
-### 2.根据配置属性生成过滤器
+# 2.根据配置属性生成过滤器
 
-```
+```java
 public void registerFilters() {
     boolean acceptAllInterfaces = true;
 
@@ -140,9 +138,9 @@ public void registerFilters() {
   }
 ```
 
-从上面的函数我们可以看出，控制扫描文件Spring通过不同的过滤器完成，这些定义的过滤器记录在了includeFilters和excludeFilters属性中。如果没有配置annotationClass和markerInterface，默认全部扫描所有的mapper接口。
+从上面的函数我们可以看出，控制扫描文件Spring通过不同的过滤器完成，这些定义的过滤器记录在了 `includeFilters` 和 `excludeFilters` 属性中。如果没有配置 `annotationClass` 和 `markerInterface`，默认全部扫描所有的mapper接口。
 
-```
+```java
 public void addIncludeFilter(TypeFilter includeFilter){
        this.includeFilters.add(includeFilter);
 }
@@ -152,11 +150,11 @@ public void addExcludeFilter(TypeFilter excludeFilter){
 }
 ```
 
-### 3.扫描java文件
+# 3.扫描java文件
 
-设置了相关属性以及生成了对应的过滤器后就可以进行文件的扫描了，扫描工作是有ClassPathMapperScanner类的父类ClassPathBeanDefinitionScanner（spring的类）的scan方法完成的。
+设置了相关属性以及生成了对应的过滤器后就可以进行文件的扫描了，扫描工作是有 `ClassPathMapperScanner` 类的父类 `ClassPathBeanDefinitionScanner` （spring的类）的scan方法完成的。
 
-```
+```java
 public int scan(String... basePackages) {
     int beanCountAtScanStart = this.registry.getBeanDefinitionCount();
 
@@ -171,9 +169,9 @@ public int scan(String... basePackages) {
 }
 ```
 
-scan是个全局方法，扫描工作通过`doScan(basePackages)`委托给了doScan方法，同时，还包括了includeAnnotationConfig属性的处理，AnnotationConfigUtils.registerAnnotationConfigProcessors(this.registry);代码主要是完成对于注解处理器的简单注册，我们下面主要分析下扫描功能的实现。这个方法在mybatis的`ClassPathMapperScanner`这个类里。
+scan是个全局方法，扫描工作通过`doScan(basePackages)`委托给了doScan方法，同时，还包括了 `includeAnnotationConfig` 属性的处理，`AnnotationConfigUtils.registerAnnotationConfigProcessors(this.registry);` 代码主要是完成对于注解处理器的简单注册，我们下面主要分析下扫描功能的实现。这个方法在mybatis的`ClassPathMapperScanner`这个类里。
 
-```
+```java
 @Override
   public Set<BeanDefinitionHolder> doScan(String... basePackages) {
     Set<BeanDefinitionHolder> beanDefinitions = super.doScan(basePackages);
@@ -192,7 +190,9 @@ scan是个全局方法，扫描工作通过`doScan(basePackages)`委托给了doS
   
 我们可以看到mybatis自己实现的doScan方法先调用了spring的doScan方法（spring扫描通用接口，@Controller、@Service、@Component都是走这里扫描），然后拿到了过滤后的beanDefinition集合，然后进行处理。
   
-```
+下面是spring中的 `doScan` 方法
+
+```java
 protected Set<BeanDefinitionHolder> doScan(String... basePackages) {
     Assert.notEmpty(basePackages, "At least one base package must be specified");
     Set<BeanDefinitionHolder> beanDefinitions = new LinkedHashSet<BeanDefinitionHolder>();
@@ -225,9 +225,10 @@ protected Set<BeanDefinitionHolder> doScan(String... basePackages) {
     return beanDefinitions;
 }
 ```
+
 我们可以看到最重要的就是`findCandidateComponents`这个方法，它主要过滤了一些不通过的bean，最后把通过的全部返回。我们来看看是怎么处理这些组件的。
 
-```
+```java
 public Set<BeanDefinition> findCandidateComponents(String basePackage) {
     Set<BeanDefinition> candidates = new LinkedHashSet<BeanDefinition>();
     try {
@@ -286,9 +287,9 @@ public Set<BeanDefinition> findCandidateComponents(String basePackage) {
 }
 ```
 
-findCandidateComponents方法根据传入的包路径信息并结合类文件路径拼接成文件的绝对路径，同时完成了文件的扫描过程并且根据对应的文件生成了对应的bean,使用ScannedGenericBeanDefinition类型的bean承载信息，bean中值记录了resource和source信息。这里，我们更感兴趣的是isCandidateCompanent(metadataReader)，此句代码用于判断当前扫描的文件是否符合要求，而我们之前注册的过滤器也是在此派上用场的。我们来看看对应的过滤方法1和2.
+`findCandidateComponents` 方法根据传入的包路径信息并结合类文件路径拼接成文件的绝对路径，同时完成了文件的扫描过程并且根据对应的文件生成了对应的bean,使用 `ScannedGenericBeanDefinition` 类型的bean承载信息，bean中值记录了resource和source信息。这里，我们更感兴趣的是 `isCandidateCompanent(metadataReader)`，此句代码用于判断当前扫描的文件是否符合要求，而我们之前注册的过滤器也是在此派上用场的。我们来看看对应的过滤方法1和2.
 
-```
+```java
 /**
  * 根据之前加入的filter过滤出符合条件的。
  */
@@ -323,11 +324,11 @@ protected boolean isCandidateComponent(AnnotatedBeanDefinition beanDefinition) {
   }
 ```
 
-我们看到mybatis重写了isCandidateComponent方法来让spring通过过滤。
+我们看到mybatis重写了 `isCandidateComponent` 方法来让spring通过过滤。
 
 现在扫描完毕，开始注册mapper到configuration中去。
 
-```
+```java
 private void processBeanDefinitions(Set<BeanDefinitionHolder> beanDefinitions) {
     GenericBeanDefinition definition;
     for (BeanDefinitionHolder holder : beanDefinitions) {
@@ -381,9 +382,11 @@ private void processBeanDefinitions(Set<BeanDefinitionHolder> beanDefinitions) {
   }
 ```
 
-可以发现上面利用beanDefinition构造MapperFactoryBean，传入一系列的参数，如果是一个SqlSessionFactory的情况，可以不用设置SqlSessionFactory和SqlSessionTemplate，spring会自动注入类型相同的类，那么MapperFactoryBean是如何运作的？spring是如何把MapperFactoryBean注入到各个接口的？
+上面代码的意思就是构造一个 `MapperFactoryBean` ，并把 `sqlSessionFactory` 或 `sqlSessionTemplate` 注入到 `MapperFactoryBean` 中，并把扫描到的mapper接口类注入到 `mapperInterface` 字段。
 
-### 4.注入原理分析
+下面我们看看 `MapperFactoryBean` 是如何被Spring注入到每个接口里面的。
+
+# 4.注入原理分析
 
 ```
 public class MapperFactoryBean<T> extends SqlSessionDaoSupport implements FactoryBean<T> {
@@ -455,4 +458,10 @@ mybatis最后把mapper接口和xml文件关联起来`configuration.addMapper(thi
 
 可以看到，mybatis利用FactoryBean让spring对每个接口类返回不同的类型，并且注入的都是mybatis动态代理得到的MapperProxy。
 
-至此，MapperScannerConfigurer原理分析结束。可以看出，mybatis通过一个包名先是得到下面所有的类，注册到spring容器中。然后再把对应的mapper接口放入configuration中，最后根据FactoryBean去获取真实的类型和值去注入，这样我们就可以直接在代码中引入Mapper接口来使用了。
+# 5、总结
+* 1）拿到spring配置文件中的MapperScannerConfigurer，如果配置了 `processPropertyPlaceHolders = true` 使用 `${}` 来替换 `PropertyPlaceholderConfigurer` 加载的配置文件中的值。
+* 2）过滤扫描项：如果配置了 `annotationClass` ，把标注了该注解得类加入扫描列表中。如果配置了 `markerInterface` ，则把该接口过滤出扫描列表，实现它的子类全部加入。并且不扫描 `package-info.java` 文件。
+* 3）开始扫描文件，重写了spring的scan方法来实现扫描接口。
+* 4）拿到spring缓存的所有扫描完的接口bean，实例化好 `MapperFactoryBean`，并注入 `sqlSessionFactory` 和 对应的mapper接口类。
+* 5、注入bean的时候，调用 `MapperFactoryBean` 的 `getObject` 方法得到一个动态代理生成的Mapper接口类。
+* 6、我们可以直接在代码中引入Mapper接口来调用方法了。
