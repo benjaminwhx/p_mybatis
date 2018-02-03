@@ -18,11 +18,9 @@
   </bean>
 ```
 
+那么，有多少同学想过这个SqlSessionFactoryBean是什么呢？没错，它相当于一个工厂类的概念，spring把它当做一个Bean管理起来，用到了就给你返回它。因为SqlSessionFactory全局唯一即可，所以它可以被spring管理为单例。我们下面通过源码分析来看看它的几个主要方法：
 
-
-那么，有多少同学想过这个SqlSessionFactoryBean是什么呢？没错，它相当于一个工厂类的概念，spring把它当做一个Bean管理起来，用到了就给你返回它。因为SqlSessionFactory全局唯一即可，所以它可以被spring管理为单例。我们下面看看它的几个主要方法：
-
-
+# 1、源码分析
 
 ```java
 public class SqlSessionFactoryBean implements FactoryBean<SqlSessionFactory>, InitializingBean, ApplicationListener<ApplicationEvent> {
@@ -51,11 +49,7 @@ public class SqlSessionFactoryBean implements FactoryBean<SqlSessionFactory>, In
 }
 ```
 
-
-
 上面的 `getObject()` 方法是spring要返回的bean的值，而 `getObjectType` 则是它所代表的类型，可以发现，它在 `afterPropertiesSet` 里调用了 `buildSqlSessionFactory` 来初始化 `sqlSessionFactory`，我们来看看这个方法都做了什么。
-
-
 
 ```java
 protected SqlSessionFactory buildSqlSessionFactory() throws IOException {
@@ -773,3 +767,8 @@ private static final class SqlSessionSynchronization extends TransactionSynchron
 }
 ```
 
+# 2、总结
+* 1）通过配置参数构建SqlSessionFactory传递给MapperFactoryBean。
+* 2）调用方法进行proxy代理，并进行缓存。
+* 3）sqlSession使用proxy代理，并在事务环境中把sqlSession等参数缓存在spring的threadLocal中。
+* 4）注册事务回调类SqlSessionSynchronization，用来进行事务执行各阶段的资源清理。
