@@ -409,7 +409,7 @@ public abstract class DaoSupport implements InitializingBean {
 
 上面的代码可以发现，MapperFactoryBean继承自SqlSessionDaoSupport，而SqlSessionDaoSupport继承自DaoSupport，DaoSupport实现了InitializingBean，在afterPropertiesSet方法中调用了checkDaoConfig方法。而MapperFactoryBean重写了它。
 
-大家还记得吗？刚刚扫描的时候有一个重要的方法 `processBeanDefinitions`，它把 `sqlSessionFactory` 或 `sqlSessionTemplate` 注入到 `MapperFactoryBean` 中，并把扫描到的mapper接口类注入到 `mapperInterface` 字段。最后，mybatis利用FactoryBean让spring对每个接口类返回不同的类型，并且注入的都是mybatis动态代理得到的MapperProxy。关于 `getSqlSession().getMapper(this.mapperInterface);` 如何拿到代理类的，我在另一篇博客中做了讲解：[]()
+大家还记得吗？刚刚扫描的时候有一个重要的方法 `processBeanDefinitions`，它把 `sqlSessionFactory` 或 `sqlSessionTemplate` 注入到 `MapperFactoryBean` 中，并把扫描到的mapper接口类注入到 `mapperInterface` 字段。最后，mybatis利用FactoryBean让spring对每个接口类返回不同的类型，并且注入的都是mybatis动态代理得到的MapperProxy。关于 `getSqlSession().getMapper(this.mapperInterface);` 如何拿到代理类的，我在另一篇博客中做了讲解：[mybatis在spring中注入接口原理分析下篇](./mybatis在spring中注入接口原理分析下篇.md)
 
 # 2、总结
 * 1）拿到spring配置文件中的MapperScannerConfigurer，如果配置了 `processPropertyPlaceHolders = true` 使用 `${}` 来替换 `PropertyPlaceholderConfigurer` 加载的配置文件中的值。

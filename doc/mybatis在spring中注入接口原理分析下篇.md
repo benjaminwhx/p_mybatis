@@ -196,7 +196,7 @@ configuration.setDatabaseId(this.databaseIdProvider.getDatabaseId(this.dataSourc
 
 这里是通过配置来初始化 `configuration` ，这里的 `transactionFactory` 如果用户不自定义默认为 `SpringManagedTransactionFactory` 。
 
-还记得上一篇博客里最后提到的 `MapperFactoryBean` 吗？不记得看可以看看这篇博客：[]()
+还记得上一篇博客里最后提到的 `MapperFactoryBean` 吗？不记得看可以看看这篇博客：[mybatis在spring中注入接口原理分析上篇](./mybatis在spring中注入接口原理分析上篇.md)
 
 spring在注入mybatis接口的时候其实拿到的是 `MapperFactoryBean` 的 `getObject` 返回的值：`getSqlSession().getMapper(this.mapperInterface);` 这里获取的 `SqlSession` 其实是 `SqlSessionTemplate`  那它是如何获取Mapper的呢？
 
