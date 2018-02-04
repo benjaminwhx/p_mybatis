@@ -1,4 +1,4 @@
-```
+```java
 <!-- mybatis configuration配置文件中配置 -->
 <plugins>
     <plugin interceptor="com.jd.jr.bt.mybatis.plugin.ExamplePlugin">
@@ -8,7 +8,7 @@
 ```
 
 配置完成后，Configuration会进行解析，并加入配置的拦截器。
-```
+```java
 // 初始化拦截链
 protected final InterceptorChain interceptorChain = new InterceptorChain();
 
@@ -31,9 +31,9 @@ public void addInterceptor(Interceptor interceptor) {
 }
 ```
 
-Configuration类中有几个方法通过`interceptorChain.pluginAll()`调用了自定义拦截器的plugin方法来生成代理对象，源码如下：
+Configuration类中有几个方法通过 `interceptorChain.pluginAll()` 调用了自定义拦截器的plugin方法来生成代理对象，源码如下：
 
-```
+```java
 public ParameterHandler newParameterHandler(MappedStatement mappedStatement, Object parameterObject, BoundSql boundSql) {
     ParameterHandler parameterHandler = mappedStatement.getLang().createParameterHandler(mappedStatement, parameterObject, boundSql);
     parameterHandler = (ParameterHandler) interceptorChain.pluginAll(parameterHandler);
@@ -61,7 +61,7 @@ public Executor newExecutor(Transaction transaction, ExecutorType executorType) 
 
 我们再来看看拦截链的源码，实际上mybatis的四大对象StatementHandler、ParameterHandler、ResultHandler和Executor都调用了pluginAll方法，并且都会进入你配置的拦截器的plugin方法：
 
-```
+```java
 public class InterceptorChain {
 
   private final List<Interceptor> interceptors = new ArrayList<Interceptor>();
@@ -89,7 +89,7 @@ public class InterceptorChain {
 
 我们自己定义的拦截器的plugin方法实际上调用了Plugin的wrap方法，我们看看wrap的源码：
 
-```
+```java
 public static Object wrap(Object target, Interceptor interceptor) {
     // 获取自定义拦截器中定义的@Intercepts中配置的类和方法的map
     Map<Class<?>, Set<Method>> signatureMap = getSignatureMap(interceptor);
@@ -111,7 +111,7 @@ public static Object wrap(Object target, Interceptor interceptor) {
 
 如果plugin返回的是target的代理类，那么后面执行target的方法时，就会进入Plugin的invoke方法中（不懂的请去了解jdk动态代理的相关知识）
 
-```
+```java
 @Override
   public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
     try {
