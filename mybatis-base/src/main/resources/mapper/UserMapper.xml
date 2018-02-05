@@ -61,7 +61,15 @@
 		    id = #{uid, jdbcType=BIGINT}
 	    </where>
 	</select>
-	
+
+	<select id="getUserByUserIdAndResultHandler" resultMap="userResultMap">
+		SELECT
+		<include refid="selectColumns">
+			<property name="prefix" value="a" />
+		</include>
+		FROM cf_user
+	</select>
+
 	<select id="getUsersByName" resultMap="userResultMap">
 		SELECT
 		<include refid="selectColumns">

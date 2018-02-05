@@ -4,6 +4,7 @@ import com.github.base.bean.MyPage;
 import com.github.base.bean.SEX;
 import com.github.base.bean.User;
 import com.github.base.mapper.UserMapper;
+import com.github.base.resulthandler.UserResultHandler;
 import com.github.base.util.PrintUtil;
 import com.github.core.util.MyBatisConfigHelper;
 import org.apache.ibatis.session.RowBounds;
@@ -92,6 +93,12 @@ public class MyBatisCoreBuilder {
 		PrintUtil.printList(userList, logger);
 	}
 
+	private void testUserMapperSelect6() {
+		SqlSession sqlSession = MyBatisConfigHelper.getSqlSession();
+		UserMapper mapper = sqlSession.getMapper(UserMapper.class);
+		mapper.getUserByUserIdAndResultHandler(new UserResultHandler());
+	}
+
 	private void testUserMapperUpdate() {
 		SqlSession sqlSession = MyBatisConfigHelper.getSqlSession(true);
 		UserMapper mapper = sqlSession.getMapper(UserMapper.class);
@@ -111,12 +118,13 @@ public class MyBatisCoreBuilder {
 		MyBatisCoreBuilder builder = new MyBatisCoreBuilder();
 //		builder.testUserMapperInsert();
 //		builder.testUserMapperInsertMulti();
-		builder.testUserMapperSelect1();
+//		builder.testUserMapperSelect1();
 //		builder.testUserMapperSelect2();
 //		builder.testUserMapperSelect3();
 //		builder.testUserMapperSelect4();
 //		builder.testUserMapperSelect5();
 //		builder.testUserMapperUpdate();
 //		builder.testUserMapperDelete();
+		builder.testUserMapperSelect6();
 	}
 }

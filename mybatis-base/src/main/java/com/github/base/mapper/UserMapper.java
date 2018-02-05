@@ -3,6 +3,7 @@ package com.github.base.mapper;
 import com.github.base.bean.MyPage;
 import com.github.base.bean.User;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 
 import java.util.List;
@@ -41,6 +42,8 @@ public interface UserMapper {
 	 * @return
 	 */
 	User getUserByUserId(Long uid);
+
+	void getUserByUserIdAndResultHandler(ResultHandler resultHandler);
 
 	/**
 	 * 使用@Param来定义参数名获取user
