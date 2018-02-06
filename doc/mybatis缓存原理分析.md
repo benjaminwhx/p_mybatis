@@ -1,14 +1,11 @@
-# mybatis缓存原理分析
-
-## 1.mybatis中的缓存原理（不结合spring）
+# 1.mybatis中的缓存原理（不结合spring）
 
 Mybatis中有一级缓存和二级缓存，默认情况下一级缓存是开启的，而且是不能关闭的。一级缓存是指SqlSession级别的缓存，当在同一个SqlSession中进行相同的SQL语句查询时，第二次以后的查询不会从数据库查询，而是直接从缓存中获取，一级缓存最多缓存1024条SQL。二级缓存是指可以跨SqlSession的缓存。  
 
-### 1.1.一级缓存
-
+## 1.1.一级缓存
 一级缓存是默认启用的，在BaseExecutor的query()方法中实现，底层默认使用的是PerpetualCache实现，PerpetualCache采用HashMap存储数据。一级缓存会在进行增、删、改操作时进行清除。  
 
-```
+```java
 // 维护者一个map的缓存
 protected PerpetualCache localCache;
 protected PerpetualCache localOutputParameterCache; 
@@ -100,7 +97,7 @@ private <E> List<E> queryFromDatabase(MappedStatement ms, Object parameter, RowB
    
 我们发现同一个SqlSession的情况下会清除一级缓存，但是不同的SqlSession之间会出现脏数据问题，必须自己手动指定flush。
 
-```
+```java
 结论：一级缓存默认存在，不想使用有两种方法关闭。
 (1)、<select>指定flushCache="true"
 (2)、<setting name="localCacheScope" value="SESSION"/>
@@ -108,7 +105,7 @@ private <E> List<E> queryFromDatabase(MappedStatement ms, Object parameter, RowB
 一级缓存存在脏数据问题，必须自己手动flush
 ```
 
-### 1.2.二级缓存
+## 1.2.二级缓存
 
 mybatis默认Configuration中是启用二级缓存的，可以通过改变配置cacheEnabled="false"来不走二级缓存。  
 
@@ -116,7 +113,7 @@ mybatis默认Configuration中是启用二级缓存的，可以通过改变配置
 
 我们来看看二级缓存的实现：
 
-```
+```java
 @Override
   public <E> List<E> query(MappedStatement ms, Object parameterObject, RowBounds rowBounds, ResultHandler resultHandler, CacheKey key, BoundSql boundSql)
       throws SQLException {
@@ -155,7 +152,7 @@ public int update(MappedStatement ms, Object parameterObject) throws SQLExceptio
 }
 ```
 
-```
+```java
 结论：
 (1)、二级缓存开启需要指定<cache />
 (2)、不使用二级缓存类CachingExecutor：<setting name="cacheEnabled" value="false"/>
@@ -163,11 +160,11 @@ public int update(MappedStatement ms, Object parameterObject) throws SQLExceptio
 (4)、其他标签默认属性 flushCache="true" 和 useCache="false"
 ```
 
-## 2.mybatis在spring中的缓存
+# 2.mybatis在spring中的缓存
 
 mybatis结合spring使用的sqlSession其实是SqlSessionTemplate，它里面保留了一个SqlSession的动态代理对象，用来执行真正的sql，最后都会进入它的invoke方法。
 
-```
+```java
 public SqlSessionTemplate(SqlSessionFactory sqlSessionFactory, ExecutorType executorType,
       PersistenceExceptionTranslator exceptionTranslator) {
 
@@ -224,7 +221,7 @@ private class SqlSessionInterceptor implements InvocationHandler {
 
 可以看到invoke方法里面有几个重要的方法，我们一个个来看，首先是getSqlSession()
 
-```
+```java
 public static SqlSession getSqlSession(SqlSessionFactory sessionFactory, ExecutorType executorType, PersistenceExceptionTranslator exceptionTranslator) {
 
     notNull(sessionFactory, NO_SQL_SESSION_FACTORY_SPECIFIED);
@@ -290,7 +287,7 @@ private static void registerSessionHolder(SqlSessionFactory sessionFactory, Exec
 
 可以看出，每次操作都会根据SqlSessionFactory去Spring事务中去获取SqlSession，那么SqlSession是何时释放的呢？我们看SqlSessionSynchronization这个类的实现。
 
-```
+```java
 private static final class SqlSessionSynchronization extends TransactionSynchronizationAdapter {
 
     private final SqlSessionHolder holder;
@@ -396,7 +393,7 @@ private static final class SqlSessionSynchronization extends TransactionSynchron
 
 我们可以看到beforeCommit方法在事务提交之前SqlSession进行了commit操作。在beforeCompletion事务完成之前进行了close操作
 
-```
+```java
 // DefaultSqlSession.class
 @Override
   public void commit() {
@@ -466,7 +463,7 @@ private static final class SqlSessionSynchronization extends TransactionSynchron
 
 我们再来看closeSqlSession()方法：
 
-```
+```java
 public static void closeSqlSession(SqlSession session, SqlSessionFactory sessionFactory) {
     notNull(session, NO_SQL_SESSION_SPECIFIED);
     notNull(sessionFactory, NO_SQL_SESSION_FACTORY_SPECIFIED);
