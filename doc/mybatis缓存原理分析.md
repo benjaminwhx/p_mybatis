@@ -73,15 +73,17 @@ private <E> List<E> queryFromDatabase(MappedStatement ms, Object parameter, RowB
 }
 ```
 
-可以看到上面的查询方法先是看<select>有没有flushCache="true"，有就刷新一级缓存，没有的话先去从一级缓存取数据，如果一级缓存里没有结果，调用`queryFromDatabase`方法，从数据库查询结果并返回。
+可以看到上面的查询方法先是看&lt;select&gt;有没有flushCache="true"，有就刷新一级缓存，没有的话先去从一级缓存取数据，如果一级缓存里没有结果，调用`queryFromDatabase`方法，从数据库查询结果并返回。
 
-一级缓存的范围有 `SESSION` 和 `STATEMENT` 两种，默认是 `SESSION` ，如果我们不需要使用一级缓存，那么我们可以把一级缓存的范围指定为STATEMENT，这样每次执行完一个Mapper语句后都会将一级缓存清除。如果需要更改一级缓存的范围，请在Mybatis的配置文件中，在<settings>下通过localCacheScope指定。  
+一级缓存的范围有 `SESSION` 和 `STATEMENT` 两种，默认是 `SESSION` ，如果我们不需要使用一级缓存，那么我们可以把一级缓存的范围指定为STATEMENT，这样每次执行完一个Mapper语句后都会将一级缓存清除。如果需要更改一级缓存的范围，请在Mybatis的配置文件中，在&lt;settings&gt;下通过localCacheScope指定。  
 
 我们发现同一个SqlSession的情况下会清除一级缓存，但是不同的SqlSession之间会出现脏数据问题，必须自己手动指定flush。
 
-> 结论：一级缓存默认存在，不想使用有两种方法关闭。
-> 1. <select>指定flushCache="true"
-> 2. <setting name="localCacheScope" value="SESSION"/>
+**结论：一级缓存默认存在，不想使用有两种方法关闭。**
+
+> 1. <select&gt;指定flushCache="true"
+> 2. 指定flushCache="true"
+> 3. <setting name="localCacheScope" value="SESSION"/&gt;
 
 ## 1.2.二级缓存
 
@@ -89,7 +91,7 @@ mybatis默认Configuration中是启用二级缓存的，可以通过改变配置
 
 默认二级缓存使用CachingExecutor来分发执行sql，但是要想真正启用二级缓存，还得在xml中指定<cache />，这样才会真正生效，每个sql标签默认有个属性useCache，默认是true，如果单独某个或某几个sql不想使用二级缓存，可以指定useCache="false"。
 
-<cache />的具体使用如下：
+&lt;cache /&gt;的具体使用如下：
 
 ```java
 <!--
@@ -148,9 +150,9 @@ public int update(MappedStatement ms, Object parameterObject) throws SQLExceptio
 }
 ```
 
-> 结论：
-> 1. 二级缓存开启需要指定<cache />
-> 2. 不使用二级缓存类CachingExecutor：<setting name="cacheEnabled" value="false"/>
+**结论：**
+> 1. 二级缓存开启需要指定<cache /&gt;
+> 2. 不使用二级缓存类CachingExecutor：<setting name="cacheEnabled" value="false"/&gt;
 > 3. 查询标签默认属性 flushCache="false" 和 useCache="true"
 > 4. 其他标签默认属性 flushCache="true" 和 useCache="false"
 
@@ -246,10 +248,10 @@ public void close(boolean forceRollback) {
 
 源码中都有注释解释了每一步的操作，有以下几步：
 
-1. 通过`sessionFactory.openSession(executorType)` 新建一个sqlSession。
-2. 执行sqlSession的查询方法，默认放入缓存中。
-3. 执行 `sqlSession.commit(true);` 清除缓存。
-4. 调用 `close` 方法做资源处理操作
+> 1. 通过`sessionFactory.openSession(executorType)` 新建一个sqlSession。
+> 2. 执行sqlSession的查询方法，默认放入缓存中。
+> 3. 执行 `sqlSession.commit(true);` 清除缓存。
+> 4. 调用 `close` 方法做资源处理操作
 
 我们可以发现，在spring中不开启事务的情况下，查询是怎么都不会有缓存的！！！
 
@@ -297,9 +299,9 @@ public static void closeSqlSession(SqlSession session, SqlSessionFactory session
 
 源码中都有注释解释了每一步的操作，每一次的select statement都有以下几步：
 
-1. 开启事务后，第一次通过`sessionFactory.openSession(executorType)` 新建一个sqlSession。之后的所有查询操作都会复用之前的sqlSession。也就是session共享。
-2. 执行sqlSession的查询方法，默认放入缓存中。
-3. 调用 `close` 方法进行引用次数-1的操作。
+> 1. 开启事务后，第一次通过`sessionFactory.openSession(executorType)` 新建一个sqlSession。之后的所有查询操作都会复用之前的sqlSession。也就是session共享。
+> 2. 执行sqlSession的查询方法，默认放入缓存中。
+> 3. 调用 `close` 方法进行引用次数-1的操作。
 
 
 
@@ -345,4 +347,4 @@ public void afterCompletion(int status) {
 
 # 3、总结
 
-如果想在spring项目中不使用一级缓存，除了可以让查询在无事务的方法中，还可以通过指定单个<select>标签上 `flushCache="true"` 。如果你想让项目中所有的查询都不走一级缓存，可以直接通过 `<setting name="localCacheScope" value="SESSION"/>` 来完成。
+如果想在spring项目中不使用一级缓存，除了可以让查询在无事务的方法中，还可以通过指定单个`<select>`标签上 `flushCache="true"` 。如果你想让项目中所有的查询都不走一级缓存，可以直接通过 `<setting name="localCacheScope" value="SESSION"/>` 来完成。
