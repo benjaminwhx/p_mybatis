@@ -2,6 +2,7 @@ package com.github.base.mapper;
 
 import com.github.base.bean.MyPage;
 import com.github.base.bean.User;
+import org.apache.ibatis.annotations.Flush;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
@@ -21,6 +22,16 @@ public interface UserMapper {
 	 * @return
 	 */
 	int insert(User user);
+
+	/**
+	 * 批量插入
+	 * @param users
+	 * @return
+	 */
+	int insertBatch(List<User> users);
+
+	@Flush
+	void flush();
 
 	/**
 	 * 更新

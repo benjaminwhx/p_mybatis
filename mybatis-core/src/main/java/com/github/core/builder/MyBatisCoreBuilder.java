@@ -7,12 +7,10 @@ import com.github.base.mapper.UserMapper;
 import com.github.base.resulthandler.UserResultHandler;
 import com.github.base.util.PrintUtil;
 import com.github.core.util.MyBatisConfigHelper;
-import org.apache.ibatis.session.RowBounds;
-import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
+import java.util.*;
 
 /**
  * User: 吴海旭
@@ -114,6 +112,81 @@ public class MyBatisCoreBuilder {
 		mapper.delete(1L);
 	}
 
+	// batch方式花费：10869ms
+	private void testUserMapperBatch() {
+		SqlSession sqlSession = MyBatisConfigHelper.getSqlSession(ExecutorType.BATCH);
+		UserMapper mapper = sqlSession.getMapper(UserMapper.class);
+		long begin = System.currentTimeMillis();
+		for (int i = 0; i < 100; i++) {
+			for (int j = 0; j < 1000; j++) {
+				User user = new User();
+				user.setUserName("new名字" + j);
+				user.setSex(SEX.MALE);
+				user.setRoleId(1L);
+				mapper.insert(user);
+			}
+			sqlSession.commit();
+		}
+		long end = System.currentTimeMillis();
+		System.out.println("batch方式花费：" + (end - begin) + "ms");
+	}
+
+	// batch方式花费：10388ms
+	private void testUserMapperBatch2() {
+		SqlSession sqlSession = MyBatisConfigHelper.getSqlSession(ExecutorType.BATCH);
+		UserMapper mapper = sqlSession.getMapper(UserMapper.class);
+		long begin = System.currentTimeMillis();
+		for (int i = 0; i < 100; i++) {
+			for (int j = 0; j < 1000; j++) {
+				User user = new User();
+				user.setUserName("new名字" + j);
+				user.setSex(SEX.MALE);
+				user.setRoleId(1L);
+				mapper.insert(user);
+			}
+			mapper.flush();
+		}
+		sqlSession.commit();
+		long end = System.currentTimeMillis();
+		System.out.println("batch方式花费：" + (end - begin) + "ms");
+	}
+
+	// mapper文件for循环方式花费：3110ms
+	private void testInsertBatch() {
+		SqlSession sqlSession = MyBatisConfigHelper.getSqlSession(true);
+		UserMapper mapper = sqlSession.getMapper(UserMapper.class);
+		long begin = System.currentTimeMillis();
+		for (int i = 0; i < 100; i++) {
+			List<User> users = new ArrayList<>();
+			for (int j = 0; j < 1000; j++) {
+				User user = new User();
+				user.setUserName("new2名字" + j);
+				user.setSex(SEX.FEMALE);
+				user.setRoleId(1L);
+				users.add(user);
+			}
+			mapper.insertBatch(users);
+		}
+		long end = System.currentTimeMillis();
+		System.out.println("mapper文件for循环方式花费：" + (end - begin) + "ms");
+	}
+
+	// mapper文件for循环方式花费：33705ms
+	private void testInsert() {
+		SqlSession sqlSession = MyBatisConfigHelper.getSqlSession(true);
+		UserMapper mapper = sqlSession.getMapper(UserMapper.class);
+		long begin = System.currentTimeMillis();
+		for (int i = 0; i < 100000; i++) {
+			User user = new User();
+			user.setUserName("new2名字" + i);
+			user.setSex(SEX.FEMALE);
+			user.setRoleId(1L);
+			mapper.insert(user);
+		}
+		long end = System.currentTimeMillis();
+		System.out.println("mapper文件for循环方式花费：" + (end - begin) + "ms");
+	}
+
 	public static void main(String[] args) {
 		MyBatisCoreBuilder builder = new MyBatisCoreBuilder();
 //		builder.testUserMapperInsert();
@@ -125,6 +198,10 @@ public class MyBatisCoreBuilder {
 //		builder.testUserMapperSelect5();
 //		builder.testUserMapperUpdate();
 //		builder.testUserMapperDelete();
-		builder.testUserMapperSelect6();
+//		builder.testUserMapperSelect6();
+//		builder.testUserMapperBatch();
+		builder.testUserMapperBatch2();
+//		builder.testInsertBatch();
+//		builder.testInsert();
 	}
 }

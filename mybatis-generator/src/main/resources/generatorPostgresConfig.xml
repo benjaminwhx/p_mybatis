@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+		PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+		"http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+<generatorConfiguration>
+	<context id="MySQLTables" defaultModelType="flat">
+		<property name="autoDelimitKeywords" value="true" />
+		<property name="beginningDelimiter" value="`" />
+		<property name="endingDelimiter" value="`" />
+		
+		<commentGenerator>
+			<property name="suppressAllComments" value="true"/>
+			<property name="suppressDate" value="true"/>
+		</commentGenerator>
+		
+		<jdbcConnection driverClass="org.postgresql.Driver"
+		                connectionURL="jdbc:postgresql://localhost:5432/postgres"
+		                userId="postgres"
+		                password="wheet123">
+		</jdbcConnection>
+		
+		<javaTypeResolver >
+			<property name="forceBigDecimals" value="false" />
+		</javaTypeResolver>
+		
+		<javaModelGenerator targetPackage="com.github.generator" targetProject="/Users/benjamin/idea_project/pq-mybatis/mybatis-generator/src/main/java">
+			<property name="enableSubPackages" value="true" />
+			<property name="trimStrings" value="true" />
+		</javaModelGenerator>
+		
+		<sqlMapGenerator targetPackage="mapper"  targetProject="/Users/benjamin/idea_project/pq-mybatis/mybatis-generator/src/main/resources">
+			<property name="enableSubPackages" value="true" />
+		</sqlMapGenerator>
+		
+		<javaClientGenerator type="XMLMAPPER" targetPackage="com.github.generator.mapper"
+		                     targetProject="/Users/benjamin/idea_project/pq-mybatis/mybatis-generator/src/main/java"/>
+		
+		<!--
+			tableName="%" 生成全部表，可以使用SQL通配符匹配多个表
+				% 替代一个或多个字符
+				_ 仅替代一个字符
+				[charlist] 字符列中的任何单一字符
+				[^charlist]或者[!charlist] 不在字符列中的任何单一字符
+			
+		-->
+		<table tableName="disbursement" domainObjectName="Disbursement">
+			<generatedKey column="disbursement_id" sqlStatement="JDBC"/>
+		</table>
+		<table tableName="installment" domainObjectName="Installment">
+			<generatedKey column="transaction_id" sqlStatement="JDBC"/>
+		</table>
+		<table tableName="movement" domainObjectName="Movement">
+			<generatedKey column="transaction_movement_id" sqlStatement="JDBC"/>
+		</table>
+		<table tableName="repayment" domainObjectName="Repayment">
+			<generatedKey column="repayment_id" sqlStatement="JDBC"/>
+		</table>
+		<table tableName="repayment_transaction_mapping" domainObjectName="RepaymentMapping">
+			<generatedKey column="repayment_mapping_id" sqlStatement="JDBC"/>
+		</table>
+		<table tableName="refund" domainObjectName="Refund">
+			<generatedKey column="refund_id" sqlStatement="JDBC"/>
+		</table>
+		<table tableName="payment_out" domainObjectName="PaymentOut">
+			<generatedKey column="payment_out_id" sqlStatement="JDBC"/>
+		</table>
+	</context>
+</generatorConfiguration>

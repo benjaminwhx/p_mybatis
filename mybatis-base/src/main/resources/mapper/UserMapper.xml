@@ -50,6 +50,15 @@
 	  	VALUES
 	  		(#{userName}, #{sex, typeHandler=com.github.base.typeHandler.MySexTypeHandler, javaType=sex, jdbcType=INTEGER}, #{roleId})
 	</insert>
+
+	<insert id="insertBatch" useGeneratedKeys="true" keyProperty="id" parameterType="user">
+		INSERT INTO
+		cf_user (user_name, sex, role_id)
+		VALUES
+		<foreach collection="list" item="item" index="index" separator=",">
+			(#{item.userName}, #{item.sex, typeHandler=com.github.base.typeHandler.MySexTypeHandler, javaType=sex, jdbcType=INTEGER}, #{item.roleId})
+		</foreach>
+	</insert>
 	
 	<select id="getUserByUserId" resultMap="userResultMap" parameterType="java.lang.Long">
 		SELECT

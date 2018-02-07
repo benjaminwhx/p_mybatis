@@ -1,6 +1,7 @@
 package com.github.core.util;
 
 import org.apache.ibatis.io.Resources;
+import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
@@ -38,5 +39,9 @@ public class MyBatisConfigHelper {
 
 	public static SqlSession getSqlSession(boolean autoCommit) {
 		return sqlSessionFactory.openSession(autoCommit);
+	}
+
+	public static SqlSession getSqlSession(ExecutorType executorType) {
+		return sqlSessionFactory.openSession(executorType);
 	}
 }
