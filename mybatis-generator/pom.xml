@@ -67,6 +67,15 @@
 						<artifactId>mysql-connector-java</artifactId>
 						<version>${mysql.version}</version>
 					</dependency>
+                    <!--
+                        https://blog.csdn.net/u_ascend/article/details/80742919
+                        mybatis-generator 的plugin有自己的classpath，我们在项目中直接继承的类和plugin不属于同一个classpath。
+                    -->
+					<dependency>
+						<groupId>com.github</groupId>
+						<artifactId>mybatis-generator</artifactId>
+						<version>1.0-SNAPSHOT</version>
+					</dependency>
 				</dependencies>
 			</plugin>
 		</plugins>
